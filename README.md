@@ -1,3 +1,92 @@
+## アイデア
+
+一言で言うと：
+
+- **FWD = Domain Modeling Made Functional の GUI 化 + 実行基盤**
+- あるいは  
+  **FWD = 関数型 DDD を業務担当者が触れる形にしたもの**
+
+---
+
+## REST の制約（思想的前提）
+
+- Make Illegal States Unrepresentable
+- DMMF と HATEOAS
+- ハイパーメディアとドメイン駆動のインターフェース
+
+---
+
+## レイヤー定義
+
+- **L0: 前提**  
+  FP（関数型プログラミング）
+
+- **L1: 思想**  
+  DMMF（Domain Model Made Functional）
+
+- **L2: フレームワーク**  
+  FWD
+
+- **L3: 動作**  
+  CLI / コード
+
+- **L4: GUI**
+
+- **L5: マジカ化**  
+  ゲーミフィケーションとは少し違うが、  
+  業務を「触れるもの」にする  
+  https://www.magicaland.org
+
+---
+
+## L4: GUI に持ち込む BPMN の概念
+
+### 構成要素
+
+- レーン
+- フロー
+- アクティビティ（ゲートウェイを内包）
+- イベント
+
+### 詳細度のレベル
+
+- **レベル 1**  
+  同じレーンにアクティビティが並ばない
+
+- **レベル 2**  
+  （※後で定義）
+
+- **レベル 3**  
+  レーンが 1 つ
+
+---
+
+## Work の 7 つの概念（EFWRTB）
+
+| 概念 | 問い | DMMF 対応 |
+|------|------|----------|
+| **Entity** | 何を扱う？ | Product Type |
+| **Function** | どう変換する？ | Function |
+| **Workflow** | どう繋がる？ | Pipeline / Composition |
+| **Rule** | どう判断する？ | Decision Function |
+| **Transition** | 何が許される？ | Make Illegal States Unrepresentable |
+| **Boundary** | 誰と / 何と接する？ | I/O at the edges |
+
+---
+
+## FWD
+
+- **FWD: Functional Work Design**
+- pronounced **"Forward"**
+- Work Design tool on **Domain Model Made Functional**
+
+---
+
+## Keywords
+
+- Domain Model Made Functional
+- HATEOAS
+
 ## FWD（Functional Work Design）の位置づけ
 
 ### 目的
