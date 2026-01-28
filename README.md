@@ -17,11 +17,34 @@ FWD は思想文ではなく、
 
 ---
 
+## 実装言語
+
+- **MoonBit**
+  - Web（js/wasm）を含む **マルチランタイム**を前提にできる言語の不在を埋める存在
+  - Rust は候補に近いが、システムプログラミング向き
+
+---
+
 ## REST の制約（思想的前提）
 
 - Make Illegal States Unrepresentable
 - DMMF と HATEOAS
 - ハイパーメディアとドメイン駆動のインターフェース
+
+---
+
+## HATEOAS 実装（HDA / mhx + tmpx）
+
+- **HATEOAS を実現する HDA ライブラリを作成中**
+- **FWD で利用することも目的の一つ**
+- 構成（現時点の方向性）
+  - **mhx runtime（JS/Wasm）**：ブラウザ側で `mx-*` 属性を解釈・実行するランタイム
+  - **mhx-spec（pure MoonBit）**：trigger/swap/sync/selector 等の型付き定義＋パーサ（単一ソース）
+  - **tmpx（all targets）**：サーバ側 HTML DSL。mhx-spec の型を一級に扱い、mhx 互換 HTML を生成する
+- 期待する開発体験
+  - アプリの主要ロジックを **MoonBit だけで完結**
+  - JS は「mhx runtime の配布・実行」のために存在し、アプリ固有 JS を極力不要にする
+  - htmx 相当の実用機能をまず揃えた上で、MoonBit 由来の拡張（型安全トリガ等）を追加する
 
 ---
 
@@ -70,6 +93,7 @@ FWD は思想文ではなく、
    - モデルが「今できる操作」「次に許される遷移」を規定する
    - 実行時 UI はモデルが自己記述的に説明する
    - HATEOAS は UI 契約として機能する
+   - この HATEOAS/UI 契約の実装基盤として **HDA（mhx/tmpx）** を利用する
 
 ---
 
@@ -126,10 +150,11 @@ FWD は思想文ではなく、
 | DMMF | モデルの正規形 |
 | Make Illegal States Unrepresentable | コンパイル規則 |
 | BPMN | 業務構造の語彙（ユーザーには直接見せない） |
-| HATEOAS | 実行時 UI / API の契約 |
+| HATEOAS | 実行時 UI / API の契約（HDA で具現化） |
 | EFWRTB | Work モデルの最小構成単位 |
 | GUI | モデル編集器 |
-| 実行基盤 | コンパイル成果物のランタイム |
+| 実行基盤 | コンパイル成果物のランタイム（Web/JS/Wasm/Native） |
+| HDA（mhx/tmpx） | HATEOAS/UI 契約の実装・配布・型安全化 |
 
 ---
 
