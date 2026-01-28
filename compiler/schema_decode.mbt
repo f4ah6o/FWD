@@ -191,7 +191,19 @@ fn decode_rule_def(value : YamlValue) -> @schema.RuleDefinition raise DecodeErro
     Map(items) => {
       let name_value = map_find(items, "name").unwrap_or(YamlValue::String(""))
       let name = as_string(name_value, "rule.name")
-      let expr = decode_rule_expr_from_map(items)
+      let type_value = optional_string(items, "type")
+      let preset_value = optional_string(items, "preset")
+      let impl_value = optional_string(items, "impl")
+      let expr = match type_value {
+        Some(t) => {
+          if t == "preset" && preset_value is None && impl_value is None {
+            @schema.RuleExpression::Preset(name)
+          } else {
+            decode_rule_expr_from_map(items)
+          }
+        }
+        None => decode_rule_expr_from_map(items)
+      }
       let description = optional_string(items, "description")
       { name, expr, description }
     }
