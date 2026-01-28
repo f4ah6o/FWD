@@ -63,6 +63,10 @@ rules:
 ```
 
 対応する L0 実装は **純粋関数**。
+v1 の `noBreakingChanges` は **state / transition の削除検出のみ**を対象とし、from/to 変更や rename 判定は v1.2+ に繰り越す。
+`noBreakingChangesOrMigrationDefined` は v1 では **breaking が検出された場合の migrate 指定**のみを要求する。
+- transition modified: 該当 transition に `effects: [migrate]`
+- transition removed / state removed: グローバル `effects: [migrate]`
 
 ### 2.2 Escape Hatch（実装関数）
 
@@ -393,6 +397,61 @@ v1 における自己記述の成立は、次の条件で定義する：
 この時点で「FWD が FWD を処理できる」ための **bootstrap が完了**している。
 
 ---
+
+## CLI Output Format: Validation JSON (v1.1)
+
+`fwdc validate` は `--json` または `--format json` 指定時に、標準出力へ機械可読な JSON を出力する。
+このとき human-readable なログは出力しない。
+
+### Exit Codes
+
+- `0`: ok
+- `1`: validation failed (reasons returned)
+
+### Success JSON
+
+```json
+{ "ok": true }
+```
+
+### Failure JSON
+
+```json
+{
+  "ok": false,
+  "errorCount": 3,
+  "reasons": [
+    {
+      "code": "BreakingChange",
+      "message": "transition modified",
+      "context": {
+        "kind": "transitionModified",
+        "subject": "submit",
+        "scope": "transition",
+        "field": "from",
+        "baseline": "Draft",
+        "candidate": "Reviewing"
+      }
+    },
+    {
+      "code": "MigrationRequired",
+      "message": "breaking change requires migration",
+      "context": {
+        "count": "1",
+        "kinds": "transitionModified",
+        "subjects": "submit",
+        "scopes": "transition"
+      }
+    }
+  ]
+}
+```
+
+### Notes
+
+- `errorCount == reasons.length`（集約後）
+- `context` は v1.1 では `Map[String,String]` 相当（JSONでは string→string object）
+- JSON のキー順は実装で安定化させる（テスト・CIの再現性のため）
 
 ## 次の実装ステップ（推奨）
 

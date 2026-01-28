@@ -1,0 +1,16 @@
+fwdVersion: "1.0"
+schemaVersion: "1.0"
+
+states:
+  - Draft
+  - Reviewing
+  - Released
+
+transitions:
+  - name: submitForReview
+    from: Draft
+    to: Released
+
+  - name: approve
+    from: Reviewing
+    to: Released

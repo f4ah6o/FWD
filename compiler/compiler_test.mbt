@@ -205,6 +205,26 @@ test "compile yaml to ir json" {
 }
 
 ///|
+test "validation json output" {
+  let reasons : Array[@core.Reason] = []
+  reasons.push(@core.Reason::with_context(
+    "BreakingChange",
+    "transition modified",
+    [("transition", "submit")],
+  ))
+  reasons.push(@core.Reason::with_context(
+    "MigrationRequired",
+    "breaking change requires migration",
+    [("count", "1")],
+  ))
+  let output = validation_json(false, reasons).stringify(indent=2)
+  assert_true(output.contains("\"ok\": false"))
+  assert_true(output.contains("\"errorCount\": 2"))
+  assert_true(output.contains("\"code\": \"BreakingChange\""))
+  assert_true(output.contains("\"code\": \"MigrationRequired\""))
+}
+
+///|
 test "validation unknown effect" {
   match compile_yaml(yaml_missing_effect()) {
     Err(ValidationFailure(reason)) => {
