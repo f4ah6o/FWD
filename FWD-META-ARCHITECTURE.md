@@ -273,6 +273,14 @@ Seed Validation の責務（v1最小）：
 - 重複（state / transition / rule / effect 等）の検出
 - 参照整合性（transition の from/to、rule/effect 参照、entity 初期 state 等）
 
+L1との一貫性確保のためのRule名
+```
+rules:
+  - hasRequiredFields
+  - noDuplicateDefinitions
+  - allReferencesResolved
+```
+
 ---
 
 ### 3) First Compile（初回コンパイル）
