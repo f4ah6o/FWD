@@ -1,0 +1,20 @@
+fwdVersion: "1.0"
+schemaVersion: "1.0"
+
+states:
+  - Draft
+  - Released
+
+effects:
+  - name: emitAudit
+    kind: sync
+  - name: notifyWebhook
+    kind: async
+
+transitions:
+  - name: release
+    from: Draft
+    to: Released
+    effects:
+      - emitAudit
+      - notifyWebhook

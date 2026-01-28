@@ -246,3 +246,54 @@ pub fn compile_yaml(input : String) -> Result[@ir.FwdIR, CompileError] {
     Err(err) => Err(err)
   }
 }
+
+///|
+/// Validate candidate schema against a baseline (v1: detect removed states).
+///|
+pub fn validate_with_baseline(
+  candidate_input : String,
+  baseline_input : String,
+) -> Result[Unit, Array[@core.Reason]] {
+  let candidate_schema = match parse_yaml(candidate_input) {
+    Ok(schema) => schema
+    Err(err) => {
+      return Err([@core.Reason::new("ParseFailure", describe_error(err))])
+    }
+  }
+  let baseline_schema = match parse_yaml(baseline_input) {
+    Ok(schema) => schema
+    Err(err) => {
+      return Err([@core.Reason::new("ParseFailure", describe_error(err))])
+    }
+  }
+  let candidate_resolved = match resolve_schema(candidate_schema) {
+    Ok(resolved) => resolved
+    Err(err) => {
+      return Err([@core.Reason::new("ResolveFailure", describe_error(err))])
+    }
+  }
+  let baseline_resolved = match resolve_schema(baseline_schema) {
+    Ok(resolved) => resolved
+    Err(err) => {
+      return Err([@core.Reason::new("ResolveFailure", describe_error(err))])
+    }
+  }
+  match validate_schema(candidate_resolved) {
+    Ok(_) => ()
+    Err(reason) => return Err([reason])
+  }
+  match validate_schema(baseline_resolved) {
+    Ok(_) => ()
+    Err(reason) => return Err([reason])
+  }
+
+  let reasons = baseline_reasons(
+    candidate_resolved.schema,
+    baseline_resolved.schema,
+  )
+  if reasons.length() == 0 {
+    Ok(())
+  } else {
+    Err(reasons)
+  }
+}
