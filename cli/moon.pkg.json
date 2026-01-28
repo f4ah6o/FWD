@@ -2,8 +2,8 @@
   "is_main": true,
   "import": [
     "fwd/compiler",
-    "moonbitlang/core/env",
     "moonbitlang/core/json",
-    "moonbitlang/x/fs"
+    "moonbitlang/x/fs",
+    "moonbitlang/x/sys"
   ]
 }

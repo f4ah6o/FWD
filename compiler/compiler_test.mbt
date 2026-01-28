@@ -18,14 +18,6 @@ fn sample_yaml() -> String {
     #|      - name: version
     #|        type: String
     #|
-    #|rules:
-    #|  - name: hasAtLeastOneState
-    #|    type: preset
-    #|  - name: hasAtLeastOneTransition
-    #|    type: preset
-    #|  - name: allReferencesResolved
-    #|    type: preset
-    #|
     #|reasons:
     #|  - code: ValidationFailure
     #|    message: Validation failed
@@ -76,6 +68,30 @@ fn yaml_missing_effect() -> String {
     #|    to: Released
     #|    effects:
     #|      - notify
+    #|
+  value
+}
+
+///|
+fn yaml_conflicting_rule() -> String {
+  let value : String =
+    #|fwdVersion: "1.0"
+    #|schemaVersion: "1.0"
+    #|
+    #|states:
+    #|  - Draft
+    #|  - Released
+    #|
+    #|rules:
+    #|  - name: hasAtLeastOneState
+    #|    type: preset
+    #|
+    #|transitions:
+    #|  - name: submit
+    #|    from: Draft
+    #|    to: Released
+    #|    rules:
+    #|      - hasAtLeastOneState
     #|
   value
 }
@@ -195,5 +211,13 @@ test "validation unknown effect" {
       inspect(reason.code(), content="unknown_effect")
     }
     _ => fail("expected validation failure")
+  }
+}
+
+///|
+test "resolve builtin rule conflict" {
+  match compile_yaml(yaml_conflicting_rule()) {
+    Err(ResolveFailure(_)) => ()
+    _ => fail("expected resolve failure")
   }
 }

@@ -15,14 +15,6 @@ entities:
       - name: version
         type: String
 
-rules:
-  - name: hasAtLeastOneState
-    type: preset
-  - name: hasAtLeastOneTransition
-    type: preset
-  - name: allReferencesResolved
-    type: preset
-
 reasons:
   - code: ValidationFailure
     message: Validation failed

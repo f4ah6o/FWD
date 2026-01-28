@@ -14,6 +14,7 @@ pub enum Stage {
 pub enum CompileError {
   Unimplemented(Stage)
   ParseFailure(String)
+  ResolveFailure(String)
   ValidationFailure(@core.Reason)
   EmitFailure(String)
 }
@@ -35,6 +36,7 @@ pub fn describe_error(err : CompileError) -> String {
   match err {
     Unimplemented(stage) => "unimplemented: " + stage_to_string(stage)
     ParseFailure(msg) => "parse error: " + msg
+    ResolveFailure(msg) => "resolve error: " + msg
     ValidationFailure(reason) =>
       "validation error: " + reason.code() + ": " + reason.message()
     EmitFailure(msg) => "emit error: " + msg
@@ -60,16 +62,11 @@ pub fn parse_yaml(input : String) -> Result[@schema.Schema, CompileError] {
 }
 
 ///|
-/// Resolve references (stub). This is a no-op in the minimal pipeline.
-///|
-pub fn resolve_schema(schema : @schema.Schema) -> Result[@schema.Schema, CompileError] {
-  Ok(schema)
-}
-
-///|
 /// Validate schema against L1 rules (minimal v1 checks).
 ///|
-pub fn validate_schema(schema : @schema.Schema) -> Result[Unit, @core.Reason] {
+pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] {
+  let schema = resolved.schema
+  let rule_index = resolved.rule_index
   if schema.fwd_version.length() == 0 {
     return Err(@core.Reason::new("missing_fwd_version", "fwdVersion is required"))
   }
@@ -193,20 +190,6 @@ pub fn validate_schema(schema : @schema.Schema) -> Result[Unit, @core.Reason] {
     boundary_set[boundary.name] = ()
   }
 
-  let preset_set : Map[String, Unit] = Map::new()
-  for name in [
-    "hasAtLeastOneState",
-    "hasAtLeastOneTransition",
-    "allReferencesResolved",
-    "noBreakingChanges",
-    "noBreakingChangesOrMigrationDefined",
-  ] {
-    preset_set[name] = ()
-  }
-  for rule in schema.rules {
-    preset_set[rule.name] = ()
-  }
-
   for entity in schema.entities {
     if !state_set.contains(entity.initial_state) {
       return Err(@core.Reason::with_context(
@@ -234,7 +217,7 @@ pub fn validate_schema(schema : @schema.Schema) -> Result[Unit, @core.Reason] {
     for expr in transition.rules {
       match expr {
         @schema.RuleExpression::Preset(name) => {
-          if !preset_set.contains(name) {
+          if !rule_index.contains(name) {
             return Err(@core.Reason::with_context(
               "unknown_rule",
               "rule is not defined",
@@ -278,9 +261,14 @@ pub fn emit_ir(schema : @schema.Schema) -> Result[@ir.FwdIR, CompileError] {
 pub fn compile_yaml(input : String) -> Result[@ir.FwdIR, CompileError] {
   match parse_yaml(input) {
     Ok(schema) => {
-      match validate_schema(schema) {
-        Ok(_) => emit_ir(schema)
-        Err(reason) => Err(ValidationFailure(reason))
+      match resolve_schema(schema) {
+        Ok(resolved) => {
+          match validate_schema(resolved) {
+            Ok(_) => emit_ir(resolved.schema)
+            Err(reason) => Err(ValidationFailure(reason))
+          }
+        }
+        Err(err) => Err(err)
       }
     }
     Err(err) => Err(err)
