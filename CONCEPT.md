@@ -209,7 +209,9 @@ Transition = Rule.check >> DomainUpdate.apply
 
 ---
 
-## 業務担当者が扱う最小概念セット（SEFRTB）
+## 業務担当者が扱う最小概念セット（STERBF）
+
+> Save Time, Eat Rice, Be Fit.
 
 | 概念 | 意味（業務担当者視点） | 内部表現 |
 |------|------------------------|----------|
