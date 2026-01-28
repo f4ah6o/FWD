@@ -234,25 +234,27 @@ FWD は
 **同じ型・同じ検証原理で管理可能**になる。
 
 ---
-
-## Bootstrap Strategy (v1)
+## 9. Bootstrap Strategy (v1)
 
 本章は、FWD の自己記述（L1 を L0 上で運用し、以後の進化を型安全に管理する）を成立させるための **root of trust** と **初回コンパイル手順**、および **以後の変更正当化ルール**を明文化する。
 
 ### 目的
+
 - 「最初の L1 スキーマ YAML は誰が/どう信頼するか」を明確化する
 - 「その YAML をどう検証・固定するか（golden IR の扱い）」を定義する
 - 「以後の変更をどう正当化するか（Transition とルール運用）」を規定する
 
 ---
 
-### 1) Seed Artifact（Root of Trust）
+### 9.1 Seed Artifact（Root of Trust）
 
 #### Seed の定義
-- `schema/fwd_schema.yaml` を **手書きの Seed Artifact** として用意する。
-- Seed は **L1 スキーマそのもの**（FWD の書き方）を表現する最初の入力である。
+
+- `schema/fwd_schema.yaml` を **手書きの Seed Artifact** として用意する
+- Seed は **L1 スキーマそのもの**（FWD の書き方）を表現する最初の入力である
 
 #### Root of Trust
+
 - Seed の信頼は、以下の2点により成立する：
   1. **L0 実装（固定点）**が提供する validator によって検証されること
   2. Seed がリポジトリにコミットされ、レビュー・署名（運用）により保護されること
@@ -261,29 +263,24 @@ FWD は
 
 ---
 
-### 2) Seed Validation（初回検証）
+### 9.2 Seed Validation（初回検証）
 
 Seed は `fwdc validate` により検証される。
 
 - 成功：`ok`（exit code 0）
 - 失敗：Reason を表示し、exit code 1
 
-Seed Validation の責務（v1最小）：
-- 必須フィールド（`fwdVersion` / `schemaVersion` 等）の存在
-- 重複（state / transition / rule / effect 等）の検出
-- 参照整合性（transition の from/to、rule/effect 参照、entity 初期 state 等）
-
-L1との一貫性確保のためのRule名
-```
+#### Validation Rules（v1 最小セット）
+```yaml
 rules:
-  - hasRequiredFields
-  - noDuplicateDefinitions
-  - allReferencesResolved
+  - hasRequiredFields       # fwdVersion / schemaVersion 等の存在
+  - noDuplicateDefinitions  # state / transition / rule / effect の重複検出
+  - allReferencesResolved   # transition の from/to、rule/effect 参照、entity 初期 state
 ```
 
 ---
 
-### 3) First Compile（初回コンパイル）
+### 9.3 First Compile（初回コンパイル）
 
 初回検証に成功した Seed から、初回の IR を生成する。
 
@@ -295,18 +292,23 @@ rules:
 
 ---
 
-### 4) Golden Check（固定と差分レビュー）
+### 9.4 Golden Check（固定と差分レビュー）
 
 #### Golden Artifact
-- `schema/fwd_schema.ir.json` を **Golden Artifact** としてリポジトリにコミットする。
+
+- `schema/fwd_schema.ir.json` を **Golden Artifact** としてリポジトリにコミットする
 
 #### Golden Check の規則
+
 - 以後の変更では、CI で常に以下を実行する：
-  - `fwdc compile schema/fwd_schema.yaml` の出力 IR
-  - committed な `schema/fwd_schema.ir.json`
-  - 両者を **完全一致**で比較する（差分があれば失敗）
+  1. `fwdc compile schema/fwd_schema.yaml` で IR を生成
+  2. committed な `schema/fwd_schema.ir.json` と比較
+  3. 両者を **正規化後の構造比較**で検証する（JSON key order / formatting を無視）
+
+- 差分があれば CI 失敗
 
 #### 例外（Golden Update）
+
 - `schema/fwd_schema.ir.json` の更新は許可されるが、必ず以下を満たす：
   - 差分が PR 上でレビュー可能な形で提示される
   - 変更理由が Change Policy（後述）により正当化されている
@@ -315,45 +317,69 @@ rules:
 
 ---
 
-### 5) Change Policy（正当化：Transition による変更管理）
+### 9.5 Change Policy（正当化：Transition による変更管理）
 
 L1 スキーマ変更は「編集」ではなく、**状態遷移（Transition）としてのみ正当化**される。
 
 #### L1 SchemaState（運用状態）
-- `Draft`
-- `Reviewing`
-- `Released`
-- `Deprecated`
+```yaml
+states:
+  - Draft
+  - Reviewing
+  - Released
+  - Deprecated
+```
 
-#### 許可される遷移（例）
-- `submitForReview`: Draft → Reviewing
-- `approve`: Reviewing → Released
-- `deprecate`: Released → Deprecated
+#### 許可される遷移
+```yaml
+transitions:
+  - name: submitForReview
+    from: Draft
+    to: Reviewing
+    rules:
+      - hasRequiredFields
+      - noDuplicateDefinitions
+      - allReferencesResolved
+
+  - name: approve
+    from: Reviewing
+    to: Released
+    rules:
+      - noBreakingChangesOrMigrationDefined
+
+  - name: deprecate
+    from: Released
+    to: Deprecated
+    effects:
+      - notifyDependentSchemas
+```
 
 #### 運用規則（v1）
+
 - `Released` なスキーマは、直接編集しない
 - 変更は必ず Draft として提案され、Reviewing を経て Released に至る
 - レビューでは Rule/Reason により以下を判定する：
   - 参照整合性（Resolve/Validate）
   - 破壊的変更の有無
-  - 移行手順（Migration/Effect）の提示有無（v1では最小要件）
+  - 移行手順（Migration/Effect）の提示有無
 
 > 変更の正当化は「人の判断」ではなく、**Rule による判定と Reason による説明可能性**を前提とする。
 
 ---
 
-### 6) まとめ（v1の自己記述成立条件）
+### 9.6 まとめ（v1 の自己記述成立条件）
 
 v1 における自己記述の成立は、次の条件で定義する：
 
-- Seed（`schema/fwd_schema.yaml`）が存在する
-- Seed が L0 validator で検証可能である
-- Seed から IR を生成できる（First Compile）
-- 生成 IR が golden として固定され、差分がレビュー対象になる（Golden Check）
-- L1 の変更が Transition とルール運用により正当化される（Change Policy）
+| 条件 | 検証方法 |
+|------|----------|
+| Seed が存在する | `schema/fwd_schema.yaml` の存在 |
+| Seed が検証可能 | `fwdc validate` が exit 0 |
+| IR が生成可能 | `fwdc compile` が成功 |
+| Golden が固定されている | CI での構造比較が一致 |
+| 変更が正当化されている | Transition + Rule/Reason による判定 |
 
 この時点で「FWD が FWD を処理できる」ための **bootstrap が完了**している。
-
 
 ---
 
