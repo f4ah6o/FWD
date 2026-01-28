@@ -1,0 +1,10 @@
+fwdVersion: "1.0"
+schemaVersion: "1.0"
+
+states:
+  - Draft
+
+transitions:
+  - name: submit
+    from: Draft
+    to: Released

@@ -8,6 +8,7 @@ test "run validate examples" {
   inspect(run(["validate", "examples/fwd_schema_change_valid.yaml"]), content="0")
   inspect(run(["validate", "examples/effects_v1.yaml"]), content="0")
   inspect(run(["validate", "examples/fwd_schema_change_invalid.yaml"]), content="1")
+  inspect(run(["validate", "examples/fwd_schema_change_valid.yaml", "--json"]), content="0")
 }
 
 ///|
@@ -68,6 +69,21 @@ test "run validate baseline" {
     ]),
     content="1",
   )
+}
+
+///|
+test "run validate json output" {
+  let ok_json = @compiler.validation_json_string(true, [])
+  inspect(run(["validate", "examples/schema_v1.yaml", "--json"]), content="0")
+  assert_true(ok_json.contains("\"ok\": true"))
+
+  let reasons : Array[@core.Reason] = []
+  reasons.push(@core.Reason::new("ValidationFailure", "states must not be empty"))
+  let err_json = @compiler.validation_json_string(false, reasons)
+  inspect(run(["validate", "examples/invalid_min.yaml", "--json"]), content="1")
+  assert_true(err_json.contains("\"ok\": false"))
+  assert_true(err_json.contains("\"errorCount\": 1"))
+  assert_true(err_json.contains("\"code\": \"ValidationFailure\""))
 }
 
 ///|

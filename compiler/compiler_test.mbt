@@ -210,18 +210,21 @@ test "validation json output" {
   reasons.push(@core.Reason::with_context(
     "BreakingChange",
     "transition modified",
-    [("transition", "submit")],
+    [("transition", "submit"), ("field", "from"), ("candidate", "Reviewing"), ("baseline", "Draft")],
   ))
   reasons.push(@core.Reason::with_context(
     "MigrationRequired",
     "breaking change requires migration",
     [("count", "1")],
   ))
-  let output = validation_json(false, reasons).stringify(indent=2)
+  let output = validation_json_string(false, reasons)
   assert_true(output.contains("\"ok\": false"))
   assert_true(output.contains("\"errorCount\": 2"))
   assert_true(output.contains("\"code\": \"BreakingChange\""))
   assert_true(output.contains("\"code\": \"MigrationRequired\""))
+  assert_true(output.contains(
+    "\"baseline\": \"Draft\",\n        \"candidate\": \"Reviewing\",\n        \"field\": \"from\",\n        \"transition\": \"submit\"",
+  ))
 }
 
 ///|

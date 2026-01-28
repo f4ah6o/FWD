@@ -41,21 +41,7 @@ fn write_output(path : String, output : String) -> Bool {
 
 ///|
 fn format_reason(reason : @core.Reason) -> String {
-  let mut context = ""
-  for pair in reason.context() {
-    let key = pair.0
-    let value = pair.1
-    if context.length() == 0 {
-      context = key + "=" + value
-    } else {
-      context = context + " " + key + "=" + value
-    }
-  }
-  if context.length() == 0 {
-    reason.code() + ": " + reason.message()
-  } else {
-    reason.code() + ": " + reason.message() + " (" + context + ")"
-  }
+  @compiler.reason_to_human_line(reason)
 }
 
 ///|
@@ -66,6 +52,17 @@ fn has_breaking(reasons : Array[@core.Reason]) -> Bool {
     }
   }
   false
+}
+
+///|
+fn reason_from_compile_error(err : @compiler.CompileError) -> @core.Reason {
+  match err {
+    @compiler.CompileError::ParseFailure(msg) =>
+      @core.Reason::new("ParseFailure", msg)
+    @compiler.CompileError::ResolveFailure(msg) =>
+      @core.Reason::new("ResolveFailure", msg)
+    @compiler.CompileError::ValidationFailure(reason) => reason
+  }
 }
 
 ///|
@@ -114,10 +111,6 @@ pub fn run(args : Array[String]) -> Int {
         return 1
       }
     } else {}
-    if json_output && baseline_path is None {
-      println(usage())
-      return 1
-    }
     let input_result = read_input_result(input_path)
     match input_result {
       Ok(input) => {
@@ -129,7 +122,7 @@ pub fn run(args : Array[String]) -> Int {
                 match @compiler.validate_with_baseline(input, baseline) {
                   Ok(_) => {
                     if json_output {
-                      println(@compiler.validation_json(true, []).stringify(indent=2))
+                      println(@compiler.validation_json_string(true, []))
                     } else {
                       println("ok")
                     }
@@ -137,7 +130,7 @@ pub fn run(args : Array[String]) -> Int {
                   }
                   Err(reasons) => {
                     if json_output {
-                      println(@compiler.validation_json(false, reasons).stringify(indent=2))
+                      println(@compiler.validation_json_string(false, reasons))
                     } else {
                       let header = if has_breaking(reasons) {
                         "error: breaking changes detected ("
@@ -160,7 +153,7 @@ pub fn run(args : Array[String]) -> Int {
                     "ReadFailure",
                     "read error: " + err.to_string(),
                   ))
-                  println(@compiler.validation_json(false, reasons).stringify(indent=2))
+                  println(@compiler.validation_json_string(false, reasons))
                 } else {
                   println("read error: " + err.to_string())
                 }
@@ -169,32 +162,63 @@ pub fn run(args : Array[String]) -> Int {
             }
           }
           None => {
-            match @compiler.parse_yaml(input) {
-              Ok(schema) => {
-                match @compiler.resolve_schema(schema) {
-                  Ok(resolved) => {
-                    match @compiler.validate_schema(resolved) {
-                      Ok(_) => {
-                        println("ok")
-                        0
-                      }
-                      Err(reason) => {
-                        println(
-                          "validation error: " + reason.code() + ": " + reason.message(),
-                        )
-                        1
+            if json_output {
+              match @compiler.parse_yaml(input) {
+                Ok(schema) => {
+                  match @compiler.resolve_schema(schema) {
+                    Ok(resolved) => {
+                      match @compiler.validate_schema(resolved) {
+                        Ok(_) => {
+                          println(@compiler.validation_json_string(true, []))
+                          0
+                        }
+                        Err(reason) => {
+                          println(@compiler.validation_json_string(false, [reason]))
+                          1
+                        }
                       }
                     }
-                  }
-                  Err(err) => {
-                    println(@compiler.describe_error(err))
-                    1
+                    Err(err) => {
+                      let reason = reason_from_compile_error(err)
+                      println(@compiler.validation_json_string(false, [reason]))
+                      1
+                    }
                   }
                 }
+                Err(err) => {
+                  let reason = reason_from_compile_error(err)
+                  println(@compiler.validation_json_string(false, [reason]))
+                  1
+                }
               }
-              Err(err) => {
-                println(@compiler.describe_error(err))
-                1
+            } else {
+              match @compiler.parse_yaml(input) {
+                Ok(schema) => {
+                  match @compiler.resolve_schema(schema) {
+                    Ok(resolved) => {
+                      match @compiler.validate_schema(resolved) {
+                        Ok(_) => {
+                          println("ok")
+                          0
+                        }
+                        Err(reason) => {
+                          println(
+                            "validation error: " + reason.code() + ": " + reason.message(),
+                          )
+                          1
+                        }
+                      }
+                    }
+                    Err(err) => {
+                      println(@compiler.describe_error(err))
+                      1
+                    }
+                  }
+                }
+                Err(err) => {
+                  println(@compiler.describe_error(err))
+                  1
+                }
               }
             }
           }
@@ -207,7 +231,7 @@ pub fn run(args : Array[String]) -> Int {
             "ReadFailure",
             "read error: " + err.to_string(),
           ))
-          println(@compiler.validation_json(false, reasons).stringify(indent=2))
+          println(@compiler.validation_json_string(false, reasons))
         } else {
           println("read error: " + err.to_string())
         }

@@ -453,6 +453,13 @@ v1 における自己記述の成立は、次の条件で定義する：
 - `context` は v1.1 では `Map[String,String]` 相当（JSONでは string→string object）
 - JSON のキー順は実装で安定化させる（テスト・CIの再現性のため）
 
+### JSON Mode Output Contract (v1.1)
+When `--json` or `--format json` is specified:
+
+- **stdout**: JSON only (no extra human-readable text)
+- **stderr**: empty on expected validation failures (reserved for unexpected runtime errors)
+- All failure modes (including file read/parse errors) are reported as JSON with `"ok": false`.
+
 ## 次の実装ステップ（推奨）
 
 1. **L0 Core の最小実装（MoonBit）**
@@ -460,4 +467,3 @@ v1 における自己記述の成立は、次の条件で定義する：
 3. **最小コンパイラ（Parse → Validate → Emit）**
 4. 「FWD が FWD を処理できる」ことを実証
 
-→ ここまでで **自己記述が実際に動く**。
