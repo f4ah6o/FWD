@@ -1,0 +1,47 @@
+fwdVersion: "1.0"
+schemaVersion: "1.0"
+
+states:
+  - Draft
+  - Reviewing
+  - Released
+
+entities:
+  - name: Schema
+    initialState: Draft
+    attributes:
+      - name: title
+        type: String
+      - name: version
+        type: String
+
+reasons:
+  - code: ValidationFailure
+    message: Validation failed
+
+boundaries:
+  - name: Reviewer
+
+transitions:
+  - name: submitForReview
+    from: Draft
+    to: Reviewing
+    rules:
+      - hasAtLeastOneState
+      - hasAtLeastOneTransition
+
+  - name: approve
+    from: Reviewing
+    to: Released
+    rules:
+      - allReferencesResolved
+
+  - name: deprecate
+    from: Released
+    to: Released
+    effects:
+      - notifyDependentSchemas
+
+effects:
+  - name: notifyDependentSchemas
+    kind: async

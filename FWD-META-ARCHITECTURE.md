@@ -233,6 +233,164 @@ FWD は
 フレームワーク自身と業務ドメインの進化が  
 **同じ型・同じ検証原理で管理可能**になる。
 
+---
+## 9. Bootstrap Strategy (v1)
+
+本章は、FWD の自己記述（L1 を L0 上で運用し、以後の進化を型安全に管理する）を成立させるための **root of trust** と **初回コンパイル手順**、および **以後の変更正当化ルール**を明文化する。
+
+### 目的
+
+- 「最初の L1 スキーマ YAML は誰が/どう信頼するか」を明確化する
+- 「その YAML をどう検証・固定するか（golden IR の扱い）」を定義する
+- 「以後の変更をどう正当化するか（Transition とルール運用）」を規定する
+
+---
+
+### 9.1 Seed Artifact（Root of Trust）
+
+#### Seed の定義
+
+- `schema/fwd_schema.yaml` を **手書きの Seed Artifact** として用意する
+- Seed は **L1 スキーマそのもの**（FWD の書き方）を表現する最初の入力である
+
+#### Root of Trust
+
+- Seed の信頼は、以下の2点により成立する：
+  1. **L0 実装（固定点）**が提供する validator によって検証されること
+  2. Seed がリポジトリにコミットされ、レビュー・署名（運用）により保護されること
+
+> v1 では Seed は「自己記述で生成される」のではなく、自己記述を開始するための **初期値**として扱う。
+
+---
+
+### 9.2 Seed Validation（初回検証）
+
+Seed は CLI で検証される。
+
+- 実行：`moon run cli -- validate schema/fwd_schema.yaml`
+- 成功：`ok`（exit code 0）
+- 失敗：`parse/resolve/validation error ...` を表示し、exit code 1
+
+#### Validation Rules（v1 実装準拠）
+L0 実装の `validate_schema` で、以下を最低保証する：
+
+- `fwdVersion` / `schemaVersion` が空でない
+- `states` / `transitions` が空でない
+- `state/transition/entity/effect/rule/reason/boundary` の **名称が空でない**かつ**重複しない**
+- `entity.initialState` が空でなく、`states` に存在する
+- `transition.from/to` が `states` に存在する
+- `transition.rules` が **解決可能**（preset 名が存在、custom の impl 名が空でない）
+- `transition.effects` が `effects` に存在する
+
+#### Resolve Rules（v1 実装準拠）
+`resolve_schema` で、以下を保証する：
+
+- Builtin preset 名の一覧をルールインデックスに登録
+- スキーマ定義の `rules:` は **builtin 名と衝突禁止**
+  - 衝突した場合は resolve error
+
+---
+
+### 9.3 First Compile（初回コンパイル）
+
+初回検証に成功した Seed から、初回の IR を生成する。
+
+- 入力：`schema/fwd_schema.yaml`
+- 実行：`moon run cli -- schema/fwd_schema.yaml schema/fwd_schema.ir.json`
+- 出力：`schema/fwd_schema.ir.json`
+
+この IR は **Seed の機械可読な固定結果**であり、以後の golden として扱う。
+
+---
+
+### 9.4 Golden Check（固定と差分レビュー）
+
+#### Golden Artifact
+
+- `schema/fwd_schema.ir.json` を **Golden Artifact** としてリポジトリにコミットする
+
+#### Golden Check の規則
+
+- 以後の変更では、CI で常に以下を実行する：
+  1. `moon run cli -- schema/fwd_schema.yaml schema/fwd_schema.ir.json` で IR を生成
+  2. committed な `schema/fwd_schema.ir.json` と比較
+  3. v1 は **同一テキスト比較**で検証する（`json.stringify(indent=2)` が安定）
+
+- 差分があれば CI 失敗
+
+#### 例外（Golden Update）
+
+- `schema/fwd_schema.ir.json` の更新は許可されるが、必ず以下を満たす：
+  - 差分が PR 上でレビュー可能な形で提示される
+  - 変更理由が Change Policy（後述）により正当化されている
+
+> v1 の golden は「正しさの証明」ではなく、**root of trust の固定点を破壊しないための検知装置**である。
+
+---
+
+### 9.5 Change Policy（正当化：Transition による変更管理）
+
+L1 スキーマ変更は「編集」ではなく、**状態遷移（Transition）としてのみ正当化**される。
+
+#### L1 SchemaState（運用状態）
+```yaml
+states:
+  - Draft
+  - Reviewing
+  - Released
+  - Deprecated
+```
+
+#### 許可される遷移
+```yaml
+transitions:
+  - name: submitForReview
+    from: Draft
+    to: Reviewing
+    rules:
+      - hasAtLeastOneState
+      - hasAtLeastOneTransition
+      - allReferencesResolved
+
+  - name: approve
+    from: Reviewing
+    to: Released
+    rules:
+      - noBreakingChangesOrMigrationDefined
+
+  - name: deprecate
+    from: Released
+    to: Deprecated
+    effects:
+      - notifyDependentSchemas
+```
+
+#### 運用規則（v1）
+
+- `Released` なスキーマは、直接編集しない
+- 変更は必ず Draft として提案され、Reviewing を経て Released に至る
+- レビューでは Rule/Reason により以下を判定する：
+  - 参照整合性（Resolve/Validate）
+  - 破壊的変更の有無
+  - 移行手順（Migration/Effect）の提示有無
+
+> 変更の正当化は「人の判断」ではなく、**Rule による判定と Reason による説明可能性**を前提とする。
+
+---
+
+### 9.6 まとめ（v1 の自己記述成立条件）
+
+v1 における自己記述の成立は、次の条件で定義する：
+
+| 条件 | 検証方法 |
+|------|----------|
+| Seed が存在する | `schema/fwd_schema.yaml` の存在 |
+| Seed が検証可能 | `moon run cli -- validate schema/fwd_schema.yaml` が exit 0 |
+| IR が生成可能 | `moon run cli -- schema/fwd_schema.yaml schema/fwd_schema.ir.json` が成功 |
+| Golden が固定されている | CI での構造比較が一致 |
+| 変更が正当化されている | Transition + Rule/Reason による判定 |
+
+この時点で「FWD が FWD を処理できる」ための **bootstrap が完了**している。
 
 ---
 

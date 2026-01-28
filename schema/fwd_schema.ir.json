@@ -1,0 +1,101 @@
+{
+  "version": "1.0",
+  "fwdVersion": "1.0",
+  "stateGraph": {
+    "nodes": [
+      "Draft",
+      "Reviewing",
+      "Released",
+      "Deprecated"
+    ],
+    "edges": {
+      "Draft": {
+        "Reviewing": {
+          "name": "submitForReview"
+        }
+      },
+      "Reviewing": {
+        "Released": {
+          "name": "approve"
+        }
+      },
+      "Released": {
+        "Deprecated": {
+          "name": "deprecate"
+        }
+      }
+    }
+  },
+  "entities": {
+    "Schema": {
+      "name": "Schema",
+      "state": "Draft",
+      "dataSchema": null
+    }
+  },
+  "transitions": {
+    "submitForReview": {
+      "name": "submitForReview",
+      "from": "Draft",
+      "to": "Reviewing",
+      "ruleRefs": [
+        "hasAtLeastOneState",
+        "hasAtLeastOneTransition",
+        "allReferencesResolved"
+      ],
+      "effectRefs": [],
+      "inputSchema": null
+    },
+    "approve": {
+      "name": "approve",
+      "from": "Reviewing",
+      "to": "Released",
+      "ruleRefs": [
+        "noBreakingChangesOrMigrationDefined"
+      ],
+      "effectRefs": [],
+      "inputSchema": null
+    },
+    "deprecate": {
+      "name": "deprecate",
+      "from": "Released",
+      "to": "Deprecated",
+      "ruleRefs": [],
+      "effectRefs": [
+        "notifyDependentSchemas"
+      ],
+      "inputSchema": null
+    }
+  },
+  "rules": {
+    "hasAtLeastOneState": {
+      "type": "preset",
+      "name": "hasAtLeastOneState"
+    },
+    "hasAtLeastOneTransition": {
+      "type": "preset",
+      "name": "hasAtLeastOneTransition"
+    },
+    "allReferencesResolved": {
+      "type": "preset",
+      "name": "allReferencesResolved"
+    },
+    "noBreakingChangesOrMigrationDefined": {
+      "type": "preset",
+      "name": "noBreakingChangesOrMigrationDefined"
+    }
+  },
+  "reasons": {
+    "ValidationFailure": {
+      "code": "ValidationFailure",
+      "message": "Validation failed",
+      "contextSchema": null
+    }
+  },
+  "effects": {
+    "notifyDependentSchemas": {
+      "name": "notifyDependentSchemas",
+      "kind": "async"
+    }
+  }
+}
