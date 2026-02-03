@@ -285,7 +285,7 @@ pub fn compile_yaml(input : String) -> Result[@ir.FwdIR, CompileError] {
       match resolve_schema(schema) {
         Ok(resolved) =>
           match validate_schema(resolved) {
-            Ok(_) => emit_ir(resolved.schema)
+            Ok(_) => Ok(normalize_schema(resolved))
             Err(reason) => Err(ValidationFailure(reason))
           }
         Err(err) => Err(err)

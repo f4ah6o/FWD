@@ -53,6 +53,161 @@ fn sample_yaml() -> String {
 }
 
 ///|
+fn sample_yaml_shuffled() -> String {
+  let value : String =
+    #|fwdVersion: "1.0"
+    #|schemaVersion: "1.0"
+    #|
+    #|states:
+    #|  - Reviewing
+    #|  - Released
+    #|  - Draft
+    #|
+    #|entities:
+    #|  - name: Schema
+    #|    initialState: Draft
+    #|    attributes:
+    #|      - name: version
+    #|        type: String
+    #|      - name: title
+    #|        type: String
+    #|
+    #|reasons:
+    #|  - code: ValidationFailure
+    #|    message: Validation failed
+    #|
+    #|boundaries:
+    #|  - name: Reviewer
+    #|
+    #|transitions:
+    #|  - name: deprecate
+    #|    from: Released
+    #|    to: Released
+    #|    effects:
+    #|      - notifyDependentSchemas
+    #|
+    #|  - name: submitForReview
+    #|    from: Draft
+    #|    to: Reviewing
+    #|    rules:
+    #|      - hasAtLeastOneTransition
+    #|      - hasAtLeastOneState
+    #|
+    #|  - name: approve
+    #|    from: Reviewing
+    #|    to: Released
+    #|    rules:
+    #|      - allReferencesResolved
+    #|
+    #|effects:
+    #|  - name: notifyDependentSchemas
+    #|    kind: async
+    #|
+  value
+}
+
+///|
+fn expected_ir_json() -> String {
+  let value : String =
+    #|{
+    #|  "version": "1.0",
+    #|  "fwdVersion": "1.0",
+    #|  "stateGraph": {
+    #|    "nodes": [
+    #|      "Draft",
+    #|      "Released",
+    #|      "Reviewing"
+    #|    ],
+    #|    "edges": {
+    #|      "Reviewing": {
+    #|        "Released": {
+    #|          "name": "approve"
+    #|        }
+    #|      },
+    #|      "Released": {
+    #|        "Released": {
+    #|          "name": "deprecate"
+    #|        }
+    #|      },
+    #|      "Draft": {
+    #|        "Reviewing": {
+    #|          "name": "submitForReview"
+    #|        }
+    #|      }
+    #|    }
+    #|  },
+    #|  "entities": {
+    #|    "Schema": {
+    #|      "name": "Schema",
+    #|      "state": "Draft",
+    #|      "dataSchema": null
+    #|    }
+    #|  },
+    #|  "transitions": {
+    #|    "approve": {
+    #|      "name": "approve",
+    #|      "from": "Reviewing",
+    #|      "to": "Released",
+    #|      "ruleRefs": [
+    #|        "allReferencesResolved"
+    #|      ],
+    #|      "effectRefs": [],
+    #|      "inputSchema": null
+    #|    },
+    #|    "deprecate": {
+    #|      "name": "deprecate",
+    #|      "from": "Released",
+    #|      "to": "Released",
+    #|      "ruleRefs": [],
+    #|      "effectRefs": [
+    #|        "notifyDependentSchemas"
+    #|      ],
+    #|      "inputSchema": null
+    #|    },
+    #|    "submitForReview": {
+    #|      "name": "submitForReview",
+    #|      "from": "Draft",
+    #|      "to": "Reviewing",
+    #|      "ruleRefs": [
+    #|        "hasAtLeastOneState",
+    #|        "hasAtLeastOneTransition"
+    #|      ],
+    #|      "effectRefs": [],
+    #|      "inputSchema": null
+    #|    }
+    #|  },
+    #|  "rules": {
+    #|    "allReferencesResolved": {
+    #|      "type": "preset",
+    #|      "name": "allReferencesResolved"
+    #|    },
+    #|    "hasAtLeastOneState": {
+    #|      "type": "preset",
+    #|      "name": "hasAtLeastOneState"
+    #|    },
+    #|    "hasAtLeastOneTransition": {
+    #|      "type": "preset",
+    #|      "name": "hasAtLeastOneTransition"
+    #|    }
+    #|  },
+    #|  "reasons": {
+    #|    "ValidationFailure": {
+    #|      "code": "ValidationFailure",
+    #|      "message": "Validation failed",
+    #|      "contextSchema": null
+    #|    }
+    #|  },
+    #|  "effects": {
+    #|    "notifyDependentSchemas": {
+    #|      "name": "notifyDependentSchemas",
+    #|      "kind": "async"
+    #|    }
+    #|  }
+    #|}
+  value
+}
+
+///|
 fn yaml_missing_effect() -> String {
   let value : String =
     #|fwdVersion: "1.0"
@@ -101,106 +256,18 @@ test "compile yaml to ir json" {
   match compile_yaml(sample_yaml()) {
     Ok(ir) => {
       let output = ir_to_json(ir).stringify(indent=2)
-      inspect(
-        output,
-        content=(
-          #|{
-          #|  "version": "1.0",
-          #|  "fwdVersion": "1.0",
-          #|  "stateGraph": {
-          #|    "nodes": [
-          #|      "Draft",
-          #|      "Reviewing",
-          #|      "Released"
-          #|    ],
-          #|    "edges": {
-          #|      "Draft": {
-          #|        "Reviewing": {
-          #|          "name": "submitForReview"
-          #|        }
-          #|      },
-          #|      "Reviewing": {
-          #|        "Released": {
-          #|          "name": "approve"
-          #|        }
-          #|      },
-          #|      "Released": {
-          #|        "Released": {
-          #|          "name": "deprecate"
-          #|        }
-          #|      }
-          #|    }
-          #|  },
-          #|  "entities": {
-          #|    "Schema": {
-          #|      "name": "Schema",
-          #|      "state": "Draft",
-          #|      "dataSchema": null
-          #|    }
-          #|  },
-          #|  "transitions": {
-          #|    "submitForReview": {
-          #|      "name": "submitForReview",
-          #|      "from": "Draft",
-          #|      "to": "Reviewing",
-          #|      "ruleRefs": [
-          #|        "hasAtLeastOneState",
-          #|        "hasAtLeastOneTransition"
-          #|      ],
-          #|      "effectRefs": [],
-          #|      "inputSchema": null
-          #|    },
-          #|    "approve": {
-          #|      "name": "approve",
-          #|      "from": "Reviewing",
-          #|      "to": "Released",
-          #|      "ruleRefs": [
-          #|        "allReferencesResolved"
-          #|      ],
-          #|      "effectRefs": [],
-          #|      "inputSchema": null
-          #|    },
-          #|    "deprecate": {
-          #|      "name": "deprecate",
-          #|      "from": "Released",
-          #|      "to": "Released",
-          #|      "ruleRefs": [],
-          #|      "effectRefs": [
-          #|        "notifyDependentSchemas"
-          #|      ],
-          #|      "inputSchema": null
-          #|    }
-          #|  },
-          #|  "rules": {
-          #|    "hasAtLeastOneState": {
-          #|      "type": "preset",
-          #|      "name": "hasAtLeastOneState"
-          #|    },
-          #|    "hasAtLeastOneTransition": {
-          #|      "type": "preset",
-          #|      "name": "hasAtLeastOneTransition"
-          #|    },
-          #|    "allReferencesResolved": {
-          #|      "type": "preset",
-          #|      "name": "allReferencesResolved"
-          #|    }
-          #|  },
-          #|  "reasons": {
-          #|    "ValidationFailure": {
-          #|      "code": "ValidationFailure",
-          #|      "message": "Validation failed",
-          #|      "contextSchema": null
-          #|    }
-          #|  },
-          #|  "effects": {
-          #|    "notifyDependentSchemas": {
-          #|      "name": "notifyDependentSchemas",
-          #|      "kind": "async"
-          #|    }
-          #|  }
-          #|}
-        ),
-      )
+      inspect(output, content=expected_ir_json())
+    }
+    Err(err) => fail(describe_error(err))
+  }
+}
+
+///|
+test "compile yaml to ir json shuffled" {
+  match compile_yaml(sample_yaml_shuffled()) {
+    Ok(ir) => {
+      let output = ir_to_json(ir).stringify(indent=2)
+      inspect(output, content=expected_ir_json())
     }
     Err(err) => fail(describe_error(err))
   }
