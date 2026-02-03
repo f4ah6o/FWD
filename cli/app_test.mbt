@@ -14,6 +14,7 @@ test "run validate examples" {
     run(["validate", "examples/fwd_schema_change_invalid.yaml"]),
     content="1",
   )
+  inspect(run(["validate", "examples/conflicting_rule.yaml"]), content="1")
   inspect(
     run(["validate", "examples/fwd_schema_change_valid.yaml", "--json"]),
     content="0",
@@ -76,10 +77,101 @@ test "run validate json output" {
   inspect(run(["validate", "examples/invalid_min.yaml", "--json"]), content="1")
   assert_true(err_json.contains("\"ok\": false"))
   assert_true(err_json.contains("\"errorCount\": 1"))
-  assert_true(err_json.contains("\"code\": \"ValidationFailure\""))
+  assert_true(err_json.contains("\"reasonVersion\": 1"))
+  assert_true(err_json.contains("\"code\": \"VALIDATION_FAILURE\""))
+  assert_true(err_json.contains("\"level\": \"error\""))
+  assert_true(err_json.contains("\"target\": \"schema\""))
 }
 
 ///|
 test "run presets" {
   inspect(run(["presets"]), content="0")
+}
+
+///|
+test "run runtime invalid input" {
+  inspect(
+    run([
+      "runtime", "available", "examples/runtime_available/model.yaml",
+      "--state", "Draft",
+      "--input", "true",
+    ]),
+    content="2",
+  )
+}
+
+///|
+test "run runtime execute" {
+  inspect(
+    run([
+      "runtime", "execute", "examples/runtime_execute/model.yaml",
+      "--state", "Draft",
+      "--transition", "approve",
+      "--input", "{\"rules\": {\"canApprove\": true, \"canReject\": false}}",
+    ]),
+    content="0",
+  )
+}
+
+///|
+test "run runtime execute invalid input" {
+  inspect(
+    run([
+      "runtime", "execute", "examples/runtime_execute/model.yaml",
+      "--state", "Draft",
+      "--transition", "approve",
+      "--input", "true",
+    ]),
+    content="2",
+  )
+}
+
+///|
+test "run runtime execute not found" {
+  inspect(
+    run([
+      "runtime", "execute", "examples/runtime_execute/model.yaml",
+      "--state", "Draft",
+      "--transition", "missing",
+      "--input", "{\"rules\": {\"canApprove\": true, \"canReject\": false}}",
+    ]),
+    content="1",
+  )
+}
+
+///|
+test "run runtime execute not available" {
+  inspect(
+    run([
+      "runtime", "execute", "examples/runtime_execute/model.yaml",
+      "--state", "Approved",
+      "--transition", "reject",
+      "--input", "{\"rules\": {\"canApprove\": true, \"canReject\": false}}",
+    ]),
+    content="1",
+  )
+}
+
+///|
+test "run hypermedia show fixture" {
+  inspect(
+    run([
+      "hypermedia", "show", "examples/hypermedia_show/model.yaml",
+      "--state", "Draft",
+      "--input", "{\"rules\": {\"canApprove\": true, \"canReject\": false}}",
+    ]),
+    content="0",
+  )
+}
+
+///|
+test "run hypermedia invalid input" {
+  inspect(
+    run([
+      "hypermedia", "show", "examples/hypermedia_show/model.yaml",
+      "--state", "Draft",
+      "--input", "true",
+    ]),
+    content="2",
+  )
 }

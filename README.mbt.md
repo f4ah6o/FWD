@@ -6,6 +6,8 @@
 moon run cli -- <schema.yaml> [output.json]
 moon run cli -- validate <schema.yaml>
 moon run cli -- presets
+moon run cli -- runtime available <schema.yaml> --state <state> [--input <json>]
+moon run cli -- runtime execute <schema.yaml> --state <state> --transition <id> [--input <json>]
 ```
 
 - If `output.json` is omitted, JSON IR is printed to stdout.
@@ -23,6 +25,213 @@ moon run cli -- validate <schema.yaml> --baseline <baseline.yaml> --json
 - Exit code is `0` on success, `1` on failure.
 - Expected validation failures are reported as JSON with `"ok": false`.
 
+## Runtime (v1)
+
+Compute available/blocked transitions from IR and a current state snapshot.
+This is pure computation: no state mutation or side effects.
+`--input` accepts an object of rule results (e.g. `{ "canApprove": true }`)
+or `{ "rules": { ... } }`.
+
+Example output:
+
+```
+{
+  "availableTransitions": [
+    { "id": "approve", "to": "Approved" }
+  ],
+  "blockedTransitions": [
+    {
+      "id": "reject",
+      "reasons": [
+        {
+          "reasonVersion": 1,
+          "code": "RULE_NOT_SATISFIED",
+          "level": "info",
+          "target": "rule",
+          "message": "Rule not satisfied",
+          "hint": "Provide rule result true for this transition"
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Runtime execute (v1)
+
+Execute a specific transition (pure computation only). Output is deterministic JSON.
+
+Example output:
+
+```
+{
+  "ok": true,
+  "transition": {
+    "id": "approve",
+    "from": "Draft",
+    "to": "Approved"
+  },
+  "effects": []
+}
+```
+
+## Runtime execute (v1)
+
+Execute applies a single transition to the current state in a **pure, deterministic** way and returns a JSON envelope.
+
+### Usage
+```sh
+fwd runtime execute <schema.yaml> --state <state> --transition <id> --input <json>
+```
+
+### Exit codes (frozen)
+- `0`: request is valid; outcome is encoded in JSON (`executed` or `blocked`)
+- `1`: invalid transition request (`not_found` or `not_available`)
+- `2`: invalid `--input` JSON (input/usage error)
+
+### Fixtures (contract locks)
+See `examples/runtime_execute/`:
+- `expected_executed.json`
+- `expected_blocked.json`
+- `expected_not_found.json`
+- `expected_not_available.json`
+
+## Runtime execute (v1)
+
+Execute applies a single transition to the current state in a **pure, deterministic** way and returns a JSON envelope.
+
+### Usage
+```sh
+fwd runtime execute <schema.yaml> --state <state> --transition <id> --input <json>
+```
+
+### Exit codes (frozen)
+- `0`: request is valid; outcome is encoded in JSON (`executed` or `blocked`)
+- `1`: invalid transition request (`not_found` or `not_available`)
+- `2`: invalid `--input` JSON (input/usage error)
+
+### Fixtures (contract locks)
+See `examples/runtime_execute/`:
+- `expected_executed.json`
+- `expected_blocked.json`
+- `expected_not_found.json`
+- `expected_not_available.json`
+
+## Hypermedia Resource (v1)
+
+`hypermedia/resource` is a **new contract** layered on top of runtime results.
+It does **not** replace the frozen runtime/CLI JSON.
+
+- Projection only: no evaluation, no classification, no inference.
+- Reason v1 is passed through as-is.
+- JSON and HTML are two projections of the same resource.
+
+Fixture path: `examples/hypermedia_show/`.
+
+## M8: mhx client hypermedia execution (browser harness)
+
+M8 adds a minimal browser harness to verify that **mx-enabled HTML** is interpreted by `mhx`
+and that clicking an mx control triggers a network request.
+
+### Build
+```
+moon build ui/client/main --target js
+```
+
+### Run
+Serve `ui/client/main/index.html` via any static server (a file:// URL will not work because the
+script path must resolve).
+
+Example:
+```
+# from repo root
+python3 -m http.server 8000
+```
+
+Then open:
+- `http://localhost:8000/ui/client/main/index.html`
+
+### Expected behavior
+- The page loads `_build/js/.../main.js`.
+- `main.js` calls `@client.init_mhx_client()`.
+- Clicking the mx-enabled button/link triggers a request to the deterministic endpoint pattern:
+  - `/hypermedia/transition/<id>`
+- The rendered HTML uses:
+  - `mx-target=".fwd-resource"`
+  - `mx-swap="outerHTML"`
+
+### Notes
+- This harness is a smoke test only; it proves client wiring and request triggering.
+- Server-side endpoints can be stubbed; the harness is valid as long as the network request fires.
+
+## M8: mhx client hypermedia execution (browser harness)
+
+M8 adds a minimal browser harness to verify that **mx-enabled HTML** is interpreted by `mhx`
+and that clicking an mx control triggers a network request.
+
+### Build
+```
+moon build ui/client/main --target js
+```
+
+### Run
+Serve `ui/client/main/index.html` via any static server (a file:// URL will not work because the
+script path must resolve).
+
+Example:
+```
+# from repo root
+python3 -m http.server 8000
+```
+
+Then open:
+- `http://localhost:8000/ui/client/main/index.html`
+
+### Expected behavior
+- The page loads `_build/js/.../main.js`.
+- `main.js` calls `@client.init_mhx_client()`.
+- Clicking the mx-enabled button/link triggers a request to the deterministic endpoint pattern:
+  - `/hypermedia/transition/<id>`
+- The rendered HTML uses:
+  - `mx-target=".fwd-resource"`
+  - `mx-swap="outerHTML"`
+
+### Notes
+- This harness is a smoke test only; it proves client wiring and request triggering.
+- Server-side endpoints can be stubbed; the harness is valid as long as the network request fires.
+
+## Reason Mini-Spec (v1)
+
+All validation, baseline, and runtime failures must be normalized to the same
+Reason shape. This is the cross-cutting, machine-readable vocabulary for v1.
+
+### Fields
+- `reasonVersion`: fixed to `1`
+- `code`: stable identifier (`SCREAMING_SNAKE`)
+- `level`: `error | warn | info`
+- `target`: `schema | state | transition | rule | effect | baseline | runtime`
+- `message`: human explanation (non-localized)
+- `hint` (optional): fix guidance
+
+### JSON Schema
+
+```
+schema/reason.schema.v1.json
+```
+
+### Example
+
+```
+{
+  "reasonVersion": 1,
+  "code": "STATE_NOT_FOUND",
+  "level": "error",
+  "target": "transition",
+  "message": "Transition refers to an undefined state",
+  "hint": "Define the state or fix the transition.from value"
+}
+```
+
 ## Builtin Rule Presets
 
 These preset rule names are reserved and provided by the compiler resolve stage:
@@ -37,7 +246,84 @@ Notes:
 
 - Preset rules can be referenced in `transitions.rules` by name.
 - A schema-defined rule **cannot** reuse a builtin name; the resolve stage will fail.
+- Reserved-name conflicts are reported as `RESERVED_WORD_CONFLICT`.
 - Schema-defined rules are allowed and live in `rules:`.
+
+## Breaking Change Taxonomy (v1)
+
+Breaking changes must return a stable `Reason.code` and are machine-detectable
+via baseline diff.
+
+### Categories
+- State removed -> `STATE_REMOVED`
+- Transition removed -> `TRANSITION_REMOVED`
+- Transition modified -> `TRANSITION_MODIFIED`
+- Schema version incompatible -> `SCHEMA_VERSION_INCOMPATIBLE`
+
+### Example (state removed)
+
+Old:
+
+```
+states:
+  - Draft
+  - Released
+```
+
+New:
+
+```
+states:
+  - Draft
+```
+
+Reason:
+
+```
+{
+  "reasonVersion": 1,
+  "code": "STATE_REMOVED",
+  "level": "error",
+  "target": "state",
+  "message": "State 'Released' was removed",
+  "hint": "Add a migration or restore the state"
+}
+```
+
+### Examples (per-code)
+
+```
+{
+  "reasonVersion": 1,
+  "code": "TRANSITION_REMOVED",
+  "level": "error",
+  "target": "transition",
+  "message": "transition removed",
+  "hint": "Transition removed; re-add transition or define migration mapping"
+}
+```
+
+```
+{
+  "reasonVersion": 1,
+  "code": "TRANSITION_MODIFIED",
+  "level": "error",
+  "target": "transition",
+  "message": "transition modified",
+  "hint": "Transition modified; review compatibility and add migration if needed"
+}
+```
+
+```
+{
+  "reasonVersion": 1,
+  "code": "MIGRATION_REQUIRED",
+  "level": "error",
+  "target": "baseline",
+  "message": "breaking change requires migration",
+  "hint": "Breaking changes detected; provide migration definitions"
+}
+```
 
 ## Example
 

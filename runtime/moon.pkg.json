@@ -1,0 +1,6 @@
+{
+  "import": [
+    "fwd/core",
+    "fwd/ir"
+  ]
+}

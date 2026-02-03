@@ -1,8 +1,10 @@
 {
   "is_main": true,
   "import": [
+    "fwd/hypermedia",
     "fwd/compiler",
     "fwd/core",
+    "fwd/runtime",
     "moonbitlang/core/json",
     "moonbitlang/x/fs",
     "moonbitlang/x/sys"

@@ -1,0 +1,10 @@
+{
+  "is_main": true,
+  "import": [
+    "fwd/ui/client"
+  ],
+  "targets": {
+    "main.mbt": ["js"],
+    "main_stub.mbt": ["not", "js"]
+  }
+}

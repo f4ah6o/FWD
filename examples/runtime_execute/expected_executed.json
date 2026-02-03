@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "transition": {
+    "id": "approve",
+    "from": "Draft",
+    "to": "Approved"
+  },
+  "effects": []
+}

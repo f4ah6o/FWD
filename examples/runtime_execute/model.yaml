@@ -1,0 +1,25 @@
+fwdVersion: "1.0"
+schemaVersion: "1.0"
+
+states:
+  - Draft
+  - Approved
+  - Rejected
+
+rules:
+  - name: canApprove
+    impl: dummy
+  - name: canReject
+    impl: dummy
+
+transitions:
+  - name: approve
+    from: Draft
+    to: Approved
+    rules:
+      - canApprove
+  - name: reject
+    from: Draft
+    to: Rejected
+    rules:
+      - canReject

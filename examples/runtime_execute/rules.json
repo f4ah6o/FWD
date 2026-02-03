@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "canApprove": true,
+    "canReject": false
+  }
+}

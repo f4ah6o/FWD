@@ -1,0 +1,9 @@
+{
+  "import": [
+    "fwd/core",
+    "fwd/compiler",
+    "fwd/runtime",
+    "moonbitlang/core/json",
+    "moonbitlang/x/fs"
+  ]
+}

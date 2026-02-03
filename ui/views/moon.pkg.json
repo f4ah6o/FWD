@@ -1,0 +1,12 @@
+{
+  "import": [
+    "fwd/core",
+    "fwd/hypermedia",
+    "f4ah6o/tmpx/tmpx"
+  ],
+  "test-import": [
+    "fwd/runtime",
+    "fwd/compiler",
+    "moonbitlang/x/fs"
+  ]
+}

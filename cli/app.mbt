@@ -1,6 +1,6 @@
 ///|
 fn usage() -> String {
-  "usage: fwdc <schema.yaml> [output.json]\n       fwdc presets\n       fwdc validate <schema.yaml> [--baseline <baseline.yaml>] [--format json|--json]"
+  "usage: fwdc <schema.yaml> [output.json]\n       fwdc presets\n       fwdc validate <schema.yaml> [--baseline <baseline.yaml>] [--format json|--json]\n       fwdc runtime available <schema.yaml> --state <state> [--input <json>]\n       fwdc runtime execute <schema.yaml> --state <state> --transition <id> [--input <json>]\n       fwdc hypermedia show <schema.yaml> --state <state> [--input <json>]"
 }
 
 ///|
@@ -48,7 +48,10 @@ fn format_reason(reason : @core.Reason) -> String {
 ///|
 fn has_breaking(reasons : Array[@core.Reason]) -> Bool {
   for reason in reasons {
-    if reason.code() == "BreakingChange" || reason.code() == "MigrationRequired" {
+    if reason.code() == "STATE_REMOVED" ||
+      reason.code() == "TRANSITION_REMOVED" ||
+      reason.code() == "TRANSITION_MODIFIED" ||
+      reason.code() == "MIGRATION_REQUIRED" {
       return true
     }
   }
@@ -61,7 +64,18 @@ fn reason_from_compile_error(err : @compiler.CompileError) -> @core.Reason {
     @compiler.CompileError::ParseFailure(msg) =>
       @core.Reason::new("ParseFailure", msg)
     @compiler.CompileError::ResolveFailure(msg) =>
-      @core.Reason::new("ResolveFailure", msg)
+      if msg.has_prefix("rule name conflicts with builtin: ") {
+        @core.Reason::with_context(
+          "RESERVED_WORD_CONFLICT",
+          msg,
+          [
+            ("target", "rule"),
+            ("hint", "Builtin rule names are reserved"),
+          ],
+        )
+      } else {
+        @core.Reason::new("ResolveFailure", msg)
+      }
     @compiler.CompileError::ValidationFailure(reason) => reason
   }
 }
@@ -71,6 +85,98 @@ pub fn run(args : Array[String]) -> Int {
   if args.length() == 0 {
     println(usage())
     return 1
+  }
+  if args[0] == "hypermedia" {
+    if args.length() < 4 {
+      println(usage())
+      return 1
+    }
+    if args[1] != "show" {
+      println(usage())
+      return 1
+    }
+    let schema_path = args[2]
+    let mut state : String? = None
+    let mut input_json : String? = None
+    for i = 3; i < args.length(); {
+      let arg = args[i]
+      if arg == "--state" {
+        if i + 1 >= args.length() {
+          println(usage())
+          return 1
+        }
+        state = Some(args[i + 1])
+        continue i + 2
+      } else if arg == "--input" {
+        if i + 1 >= args.length() {
+          println(usage())
+          return 1
+        }
+        input_json = Some(args[i + 1])
+        continue i + 2
+      } else {
+        println(usage())
+        return 1
+      }
+    } else {
+
+    }
+    let current_state = match state {
+      Some(value) => value
+      None => {
+        println(usage())
+        return 1
+      }
+    }
+    let rule_results = match input_json {
+      Some(text) =>
+        match parse_rule_results(text) {
+          Ok(values) => values
+          Err(reason) => {
+            println(runtime_error_json(reason).stringify(indent=2))
+            return 2
+          }
+        }
+      None => Map::new()
+    }
+    let schema_text = match read_input_result(schema_path) {
+      Ok(text) => text
+      Err(err) => {
+        println(runtime_error_json(@core.Reason::with_context(
+          "ReadFailure",
+          "read error: " + err.to_string(),
+          [
+            ("target", "runtime"),
+            ("level", "error"),
+            ("hint", "Provide a valid schema path"),
+          ],
+        )).stringify(indent=2))
+        return 1
+      }
+    }
+    let ir = match @compiler.compile_yaml(schema_text) {
+      Ok(value) => value
+      Err(err) => {
+        let reason = reason_from_compile_error(err)
+        println(runtime_error_json(reason).stringify(indent=2))
+        return 1
+      }
+    }
+    let runtime_result = match @runtime.compute_available_transitions(
+      ir,
+      current_state,
+      rule_results,
+    ) {
+      Ok(value) => value
+      Err(reason) => {
+        println(runtime_error_json(reason).stringify(indent=2))
+        return 1
+      }
+    }
+    let resource = @hypermedia.resource_from_runtime(runtime_result)
+    let output = @hypermedia.resource_json(resource).stringify(indent=2)
+    println(output)
+    return 0
   }
   if args[0] == "presets" {
     print_presets()
@@ -241,6 +347,135 @@ pub fn run(args : Array[String]) -> Int {
       }
     }
   } else {
+    if args[0] == "runtime" {
+      if args.length() < 4 {
+        println(usage())
+        return 1
+      }
+      let subcommand = args[1]
+      if subcommand != "available" && subcommand != "execute" {
+        println(usage())
+        return 1
+      }
+      let schema_path = args[2]
+      let mut state : String? = None
+      let mut input_json : String? = None
+      let mut transition_id : String? = None
+      for i = 3; i < args.length(); {
+        let arg = args[i]
+        if arg == "--state" {
+          if i + 1 >= args.length() {
+            println(usage())
+            return 1
+          }
+          state = Some(args[i + 1])
+          continue i + 2
+        } else if arg == "--transition" {
+          if i + 1 >= args.length() {
+            println(usage())
+            return 1
+          }
+          transition_id = Some(args[i + 1])
+          continue i + 2
+        } else if arg == "--input" {
+          if i + 1 >= args.length() {
+            println(usage())
+            return 1
+          }
+          input_json = Some(args[i + 1])
+          continue i + 2
+        } else {
+          println(usage())
+          return 1
+        }
+      } else {
+
+      }
+      let current_state = match state {
+        Some(value) => value
+        None => {
+          println(usage())
+          return 1
+        }
+      }
+      if subcommand == "execute" && transition_id is None {
+        println(usage())
+        return 1
+      }
+      let rule_results = match input_json {
+        Some(text) =>
+          match parse_rule_results(text) {
+            Ok(values) => values
+            Err(reason) => {
+              println(runtime_error_json(reason).stringify(indent=2))
+              return 2
+            }
+          }
+        None => Map::new()
+      }
+      let schema_text = match read_input_result(schema_path) {
+        Ok(text) => text
+        Err(err) => {
+          println(runtime_error_json(@core.Reason::with_context(
+            "ReadFailure",
+            "read error: " + err.to_string(),
+            [
+              ("target", "runtime"),
+              ("level", "error"),
+              ("hint", "Provide a valid schema path"),
+            ],
+          )).stringify(indent=2))
+          return 1
+        }
+      }
+      let ir = match @compiler.compile_yaml(schema_text) {
+        Ok(value) => value
+        Err(err) => {
+          let reason = reason_from_compile_error(err)
+          println(runtime_error_json(reason).stringify(indent=2))
+          return 1
+        }
+      }
+      if subcommand == "available" {
+        match @runtime.compute_available_transitions(
+          ir,
+          current_state,
+          rule_results,
+        ) {
+          Ok(result) => {
+            println(runtime_output_json(result).stringify(indent=2))
+            0
+          }
+          Err(reason) => {
+            println(runtime_error_json(reason).stringify(indent=2))
+            1
+          }
+        }
+      } else {
+        let transition_name = match transition_id {
+          Some(value) => value
+          None => {
+            println(usage())
+            return 1
+          }
+        }
+        match @runtime.execute_transition(
+          ir,
+          current_state,
+          transition_name,
+          rule_results,
+        ) {
+          Ok(outcome) => {
+            println(runtime_execute_json(outcome).stringify(indent=2))
+            0
+          }
+          Err(reason) => {
+            println(runtime_error_json(reason).stringify(indent=2))
+            1
+          }
+        }
+      }
+    } else {
     let input_path = args[0]
     let output_path = if args.length() > 1 { Some(args[1]) } else { None }
     let input_opt = read_input(input_path)
@@ -264,6 +499,7 @@ pub fn run(args : Array[String]) -> Int {
           }
         }
       None => 1
+    }
     }
   }
 }

@@ -1,0 +1,16 @@
+fwdVersion: "1.0"
+schemaVersion: "1.0"
+
+states:
+  - Draft
+
+rules:
+  - name: hasAtLeastOneState
+    impl: dummy
+
+transitions:
+  - name: submit
+    from: Draft
+    to: Draft
+    rules:
+      - hasAtLeastOneState

@@ -44,27 +44,64 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
   let rule_index = resolved.rule_index
   if schema.fwd_version.length() == 0 {
     return Err(
-      @core.Reason::new("missing_fwd_version", "fwdVersion is required"),
+      @core.Reason::with_context(
+        "missing_fwd_version",
+        "fwdVersion is required",
+        [
+          ("target", "schema"),
+          ("hint", "Set fwdVersion"),
+        ],
+      ),
     )
   }
   if schema.schema_version.length() == 0 {
     return Err(
-      @core.Reason::new("missing_schema_version", "schemaVersion is required"),
+      @core.Reason::with_context(
+        "missing_schema_version",
+        "schemaVersion is required",
+        [
+          ("target", "schema"),
+          ("hint", "Set schemaVersion"),
+        ],
+      ),
     )
   }
   if schema.states.length() == 0 {
-    return Err(@core.Reason::new("no_states", "states must not be empty"))
+    return Err(
+      @core.Reason::with_context(
+        "no_states",
+        "states must not be empty",
+        [
+          ("target", "schema"),
+          ("hint", "Define at least one state"),
+        ],
+      ),
+    )
   }
   if schema.transitions.length() == 0 {
     return Err(
-      @core.Reason::new("no_transitions", "transitions must not be empty"),
+      @core.Reason::with_context(
+        "no_transitions",
+        "transitions must not be empty",
+        [
+          ("target", "schema"),
+          ("hint", "Define at least one transition"),
+        ],
+      ),
     )
   }
   let state_set : Map[String, Unit] = Map::new()
   for state in schema.states {
     if state.name.length() == 0 {
       return Err(
-        @core.Reason::new("empty_state_name", "state name is required"),
+        @core.Reason::with_context(
+          "empty_state_name",
+          "state name is required",
+          [
+            ("target", "state"),
+            ("hint", "Set a non-empty state name"),
+          ],
+        ),
       )
     }
     if state_set.contains(state.name) {
@@ -72,7 +109,11 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
         @core.Reason::with_context(
           "duplicate_state",
           "state name must be unique",
-          [("name", state.name)],
+          [
+            ("name", state.name),
+            ("target", "state"),
+            ("hint", "Rename or remove the duplicate state"),
+          ],
         ),
       )
     }
@@ -82,8 +123,13 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
   for transition in schema.transitions {
     if transition.name.length() == 0 {
       return Err(
-        @core.Reason::new(
-          "empty_transition_name", "transition name is required",
+        @core.Reason::with_context(
+          "empty_transition_name",
+          "transition name is required",
+          [
+            ("target", "transition"),
+            ("hint", "Set a non-empty transition name"),
+          ],
         ),
       )
     }
@@ -92,15 +138,24 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
         @core.Reason::with_context(
           "duplicate_transition",
           "transition name must be unique",
-          [("name", transition.name)],
+          [
+            ("name", transition.name),
+            ("target", "transition"),
+            ("hint", "Rename or remove the duplicate transition"),
+          ],
         ),
       )
     }
     transition_set[transition.name] = ()
     if transition.from.length() == 0 || transition.to.length() == 0 {
       return Err(
-        @core.Reason::new(
-          "empty_transition_state", "transition from/to is required",
+        @core.Reason::with_context(
+          "empty_transition_state",
+          "transition from/to is required",
+          [
+            ("target", "transition"),
+            ("hint", "Set transition.from and transition.to"),
+          ],
         ),
       )
     }
@@ -109,7 +164,14 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
   for entity in schema.entities {
     if entity.name.length() == 0 {
       return Err(
-        @core.Reason::new("empty_entity_name", "entity name is required"),
+        @core.Reason::with_context(
+          "empty_entity_name",
+          "entity name is required",
+          [
+            ("target", "schema"),
+            ("hint", "Set a non-empty entity name"),
+          ],
+        ),
       )
     }
     if entity_set.contains(entity.name) {
@@ -117,15 +179,24 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
         @core.Reason::with_context(
           "duplicate_entity",
           "entity name must be unique",
-          [("name", entity.name)],
+          [
+            ("name", entity.name),
+            ("target", "schema"),
+            ("hint", "Rename or remove the duplicate entity"),
+          ],
         ),
       )
     }
     entity_set[entity.name] = ()
     if entity.initial_state.length() == 0 {
       return Err(
-        @core.Reason::new(
-          "empty_entity_state", "entity initialState is required",
+        @core.Reason::with_context(
+          "empty_entity_state",
+          "entity initialState is required",
+          [
+            ("target", "schema"),
+            ("hint", "Set entity.initialState"),
+          ],
         ),
       )
     }
@@ -134,7 +205,14 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
   for effect in schema.effects {
     if effect.name.length() == 0 {
       return Err(
-        @core.Reason::new("empty_effect_name", "effect name is required"),
+        @core.Reason::with_context(
+          "empty_effect_name",
+          "effect name is required",
+          [
+            ("target", "effect"),
+            ("hint", "Set a non-empty effect name"),
+          ],
+        ),
       )
     }
     if effect_set.contains(effect.name) {
@@ -142,7 +220,11 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
         @core.Reason::with_context(
           "duplicate_effect",
           "effect name must be unique",
-          [("name", effect.name)],
+          [
+            ("name", effect.name),
+            ("target", "effect"),
+            ("hint", "Rename or remove the duplicate effect"),
+          ],
         ),
       )
     }
@@ -151,14 +233,27 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
   let rule_set : Map[String, Unit] = Map::new()
   for rule in schema.rules {
     if rule.name.length() == 0 {
-      return Err(@core.Reason::new("empty_rule_name", "rule name is required"))
+      return Err(
+        @core.Reason::with_context(
+          "empty_rule_name",
+          "rule name is required",
+          [
+            ("target", "rule"),
+            ("hint", "Set a non-empty rule name"),
+          ],
+        ),
+      )
     }
     if rule_set.contains(rule.name) {
       return Err(
         @core.Reason::with_context(
           "duplicate_rule",
           "rule name must be unique",
-          [("name", rule.name)],
+          [
+            ("name", rule.name),
+            ("target", "rule"),
+            ("hint", "Rename or remove the duplicate rule"),
+          ],
         ),
       )
     }
@@ -168,7 +263,14 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
   for reason in schema.reasons {
     if reason.code.length() == 0 {
       return Err(
-        @core.Reason::new("empty_reason_code", "reason code is required"),
+        @core.Reason::with_context(
+          "empty_reason_code",
+          "reason code is required",
+          [
+            ("target", "schema"),
+            ("hint", "Set a non-empty reason code"),
+          ],
+        ),
       )
     }
     if reason_set.contains(reason.code) {
@@ -176,7 +278,11 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
         @core.Reason::with_context(
           "duplicate_reason",
           "reason code must be unique",
-          [("code", reason.code)],
+          [
+            ("code", reason.code),
+            ("target", "schema"),
+            ("hint", "Rename or remove the duplicate reason code"),
+          ],
         ),
       )
     }
@@ -186,7 +292,14 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
   for boundary in schema.boundaries {
     if boundary.name.length() == 0 {
       return Err(
-        @core.Reason::new("empty_boundary_name", "boundary name is required"),
+        @core.Reason::with_context(
+          "empty_boundary_name",
+          "boundary name is required",
+          [
+            ("target", "schema"),
+            ("hint", "Set a non-empty boundary name"),
+          ],
+        ),
       )
     }
     if boundary_set.contains(boundary.name) {
@@ -194,7 +307,11 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
         @core.Reason::with_context(
           "duplicate_boundary",
           "boundary name must be unique",
-          [("name", boundary.name)],
+          [
+            ("name", boundary.name),
+            ("target", "schema"),
+            ("hint", "Rename or remove the duplicate boundary"),
+          ],
         ),
       )
     }
@@ -206,7 +323,11 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
         @core.Reason::with_context(
           "unknown_state",
           "entity initialState is not defined in states",
-          [("state", entity.initial_state)],
+          [
+            ("state", entity.initial_state),
+            ("target", "state"),
+            ("hint", "Define the state or fix entity.initialState"),
+          ],
         ),
       )
     }
@@ -217,7 +338,11 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
         @core.Reason::with_context(
           "unknown_state",
           "transition.from is not defined in states",
-          [("state", transition.from)],
+          [
+            ("state", transition.from),
+            ("target", "transition"),
+            ("hint", "Define the state or fix transition.from"),
+          ],
         ),
       )
     }
@@ -226,7 +351,11 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
         @core.Reason::with_context(
           "unknown_state",
           "transition.to is not defined in states",
-          [("state", transition.to)],
+          [
+            ("state", transition.to),
+            ("target", "transition"),
+            ("hint", "Define the state or fix transition.to"),
+          ],
         ),
       )
     }
@@ -238,7 +367,11 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
               @core.Reason::with_context(
                 "unknown_rule",
                 "rule is not defined",
-                [("rule", name)],
+                [
+                  ("rule", name),
+                  ("target", "rule"),
+                  ("hint", "Define the rule or fix transition.rules"),
+                ],
               ),
             )
           }
@@ -258,7 +391,11 @@ pub fn validate_schema(resolved : ResolvedSchema) -> Result[Unit, @core.Reason] 
           @core.Reason::with_context(
             "unknown_effect",
             "transition effect is not defined",
-            [("effect", effect_name)],
+            [
+              ("effect", effect_name),
+              ("target", "effect"),
+              ("hint", "Define the effect or fix transition.effects"),
+            ],
           ),
         )
       }

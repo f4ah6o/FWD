@@ -422,35 +422,52 @@ v1 における自己記述の成立は、次の条件で定義する：
   "errorCount": 3,
   "reasons": [
     {
-      "code": "BreakingChange",
+      "reasonVersion": 1,
+      "code": "TRANSITION_MODIFIED",
+      "level": "error",
+      "target": "transition",
       "message": "transition modified",
-      "context": {
-        "kind": "transitionModified",
-        "subject": "submit",
-        "scope": "transition",
-        "field": "from",
-        "baseline": "Draft",
-        "candidate": "Reviewing"
-      }
+      "hint": "Transition modified; review compatibility and add migration if needed"
     },
     {
-      "code": "MigrationRequired",
-      "message": "breaking change requires migration",
-      "context": {
-        "count": "1",
-        "kinds": "transitionModified",
-        "subjects": "submit",
-        "scopes": "transition"
-      }
+      "reasonVersion": 1,
+      "code": "MIGRATION_REQUIRED",
+      "level": "error",
+      "target": "baseline",
+      "message": "breaking change requires migration"
     }
   ]
+}
+```
+
+### Baseline Diff Reason Examples (v1)
+
+```json
+{
+  "reasonVersion": 1,
+  "code": "TRANSITION_REMOVED",
+  "level": "error",
+  "target": "transition",
+  "message": "transition removed",
+  "hint": "Transition removed; re-add transition or define migration mapping"
+}
+```
+
+```json
+{
+  "reasonVersion": 1,
+  "code": "MIGRATION_REQUIRED",
+  "level": "error",
+  "target": "baseline",
+  "message": "breaking change requires migration",
+  "hint": "Breaking changes detected; provide migration definitions"
 }
 ```
 
 ### Notes
 
 - `errorCount == reasons.length`（集約後）
-- `context` は v1.1 では `Map[String,String]` 相当（JSONでは string→string object）
+- Reason は v1 の mini-spec 形式に正規化される
 - JSON のキー順は実装で安定化させる（テスト・CIの再現性のため）
 
 ### JSON Mode Output Contract (v1.1)
@@ -458,6 +475,64 @@ When `--json` or `--format json` is specified:
 
 - **stdout**: JSON only (no extra human-readable text)
 - **stderr**: empty on expected validation failures (reserved for unexpected runtime errors)
+
+## Execution Layer (v1)
+The execution layer applies a single transition to an entity snapshot in a **pure, deterministic** way. It does **not** perform I/O, persistence, or side effects; it only computes the next state (or a blocked/not-found result) and returns **frozen Reason v1** diagnostics.
+
+### Inputs
+- Normalized IR (v1)
+- Current entity snapshot (`state` + optional attributes)
+- Transition id to execute
+- Rule results (pre-evaluated; execution does not evaluate rules)
+
+### Outputs (execution result contract)
+Execution returns one of the following outcomes:
+
+- **executed**
+  - transition is applicable and rules pass
+  - returns `newState` and execution metadata
+- **blocked**
+  - transition exists but is not currently permitted
+  - returns `reasons[]` (Reason v1), no state change
+- **not_found**
+  - transition id does not exist in the IR
+- **not_available**
+  - transition exists, but is not reachable from the current state
+
+All non-success outcomes return diagnostics via Reason v1 and are deterministic for the same inputs.
+
+### CLI surface (frozen)
+- `fwd runtime execute <schema.yaml> --state <state> --transition <id> [--input <json>]`
+- Output is a machine-readable JSON envelope locked by fixtures under:
+  - `examples/runtime_execute/`
+
+### Exit codes (frozen)
+- `0`: executed / blocked (valid request; outcome encoded in JSON)
+- `1`: not_found / not_available (invalid transition request for this state/IR)
+- `2`: invalid `--input` JSON (CLI usage/input error)
+
+### Freeze points
+- The execution JSON envelope shape and ordering are fixture-locked.
+- Reason v1 remains frozen and is forwarded without inference.
+
+## Hypermedia Layer (v1)
+
+### Layering (conceptual)
+- compiler → runtime → hypermedia(resource) → ui(server/client)
+
+### Contracts
+- runtime/CLI JSON is frozen; hypermedia/resource is a **separate contract**
+- hypermedia is **projection only** (no evaluation, no classification, no inference)
+- Reason v1 is passed through without modification
+
+### tmpx / mhx positioning
+- server: tmpx renders deterministic HTML from hypermedia/resource
+- client: mhx executes `mx-*` attributes (fetch + swap)
+
+### Freeze points (v1)
+- Reason v1
+- runtime available JSON
+- hypermedia/resource JSON + HTML fixtures
 - All failure modes (including file read/parse errors) are reported as JSON with `"ok": false`.
 
 ## 次の実装ステップ（推奨）
@@ -466,4 +541,3 @@ When `--json` or `--format json` is specified:
 2. **L1 スキーマを YAML / MoonBit 定義で記述**
 3. **最小コンパイラ（Parse → Validate → Emit）**
 4. 「FWD が FWD を処理できる」ことを実証
-

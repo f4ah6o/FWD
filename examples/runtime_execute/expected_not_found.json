@@ -1,0 +1,10 @@
+{
+  "error": {
+    "reasonVersion": 1,
+    "code": "TRANSITION_NOT_FOUND",
+    "level": "error",
+    "target": "transition",
+    "message": "transition not found in IR",
+    "hint": "Provide a valid transition id"
+  }
+}

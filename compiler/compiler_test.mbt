@@ -210,29 +210,53 @@ test "compile yaml to ir json" {
 test "validation json output" {
   let reasons : Array[@core.Reason] = []
   reasons.push(
-    @core.Reason::with_context("BreakingChange", "transition modified", [
+    @core.Reason::with_context("TRANSITION_MODIFIED", "transition modified", [
       ("transition", "submit"),
       ("field", "from"),
       ("candidate", "Reviewing"),
       ("baseline", "Draft"),
+      ("target", "transition"),
+      ("hint", "Transition modified; review compatibility and add migration if needed"),
     ]),
   )
   reasons.push(
     @core.Reason::with_context(
-      "MigrationRequired",
+      "MIGRATION_REQUIRED",
       "breaking change requires migration",
-      [("count", "1")],
+      [
+        ("count", "1"),
+        ("target", "baseline"),
+        ("hint", "Breaking changes detected; provide migration definitions"),
+      ],
     ),
   )
   let output = validation_json_string(false, reasons)
-  assert_true(output.contains("\"ok\": false"))
-  assert_true(output.contains("\"errorCount\": 2"))
-  assert_true(output.contains("\"code\": \"BreakingChange\""))
-  assert_true(output.contains("\"code\": \"MigrationRequired\""))
-  assert_true(
-    output.contains(
-      "\"baseline\": \"Draft\",\n        \"candidate\": \"Reviewing\",\n        \"field\": \"from\",\n        \"transition\": \"submit\"",
-    ),
+  let expected =
+    #|{
+    #|  "ok": false,
+    #|  "errorCount": 2,
+    #|  "reasons": [
+    #|    {
+    #|      "reasonVersion": 1,
+    #|      "code": "TRANSITION_MODIFIED",
+    #|      "level": "error",
+    #|      "target": "transition",
+    #|      "message": "transition modified",
+    #|      "hint": "Transition modified; review compatibility and add migration if needed"
+    #|    },
+    #|    {
+    #|      "reasonVersion": 1,
+    #|      "code": "MIGRATION_REQUIRED",
+    #|      "level": "error",
+    #|      "target": "baseline",
+    #|      "message": "breaking change requires migration",
+    #|      "hint": "Breaking changes detected; provide migration definitions"
+    #|    }
+    #|  ]
+    #|}
+  inspect(
+    output,
+    content=expected,
   )
 }
 
