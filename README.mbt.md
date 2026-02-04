@@ -215,6 +215,21 @@ Fixtures (contract locks):
 
 Replay is used by injecting the cassette transport into the HTTP runner’s transport boundary.
 
+## Effects record (v2.2)
+
+Record HTTP effect execution into a cassette file (developer workflow). The command requires an allowlist prefix and writes a deterministic cassette JSON.
+
+```
+fwdc effects record --plan <plan.json> --cassette <cassette.json> --allow https://api.example.com/
+```
+
+Optional:
+- `--out <execution.json>` writes the execution result to a file (the result is also printed to stdout).
+
+Contract locks:
+- `examples/effects_v2_2/record_cli/expected_cassette.json`
+- `examples/effects_v2_2/record_cli/expected_execution.json`
+
 ## M8: mhx client hypermedia execution (browser harness)
 
 M8 adds a minimal browser harness to verify that **mx-enabled HTML** is interpreted by `mhx`
