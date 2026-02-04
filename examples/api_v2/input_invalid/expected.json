@@ -1,0 +1,10 @@
+{
+  "error": {
+    "reasonVersion": 1,
+    "code": "INPUT_JSON_INVALID",
+    "level": "error",
+    "target": "runtime",
+    "message": "payload must be an object",
+    "hint": "Provide payload as a JSON object"
+  }
+}

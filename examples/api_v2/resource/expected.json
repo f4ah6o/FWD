@@ -1,0 +1,31 @@
+{
+  "availableTransitions": [],
+  "blockedTransitions": [
+    {
+      "id": "reject",
+      "reasons": [
+        {
+          "reasonVersion": 1,
+          "code": "RULE_NOT_SATISFIED",
+          "level": "info",
+          "target": "rule",
+          "message": "Rule not satisfied",
+          "hint": "Provide rule result true for this transition"
+        }
+      ]
+    },
+    {
+      "id": "approve",
+      "reasons": [
+        {
+          "reasonVersion": 1,
+          "code": "RULE_NOT_SATISFIED",
+          "level": "info",
+          "target": "rule",
+          "message": "Rule not satisfied",
+          "hint": "Provide rule result true for this transition"
+        }
+      ]
+    }
+  ]
+}
