@@ -1,0 +1,11 @@
+{
+  "import": [
+    "fwd/core",
+    "fwd/effects_exec_adapters_v2_2",
+    "moonbitlang/core/json"
+  ],
+  "test-import": [
+    "fwd/effects_v2_2",
+    "moonbitlang/x/fs"
+  ]
+}

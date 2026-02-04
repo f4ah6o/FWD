@@ -1,0 +1,22 @@
+{
+  "cassetteVersion": "2.2",
+  "entries": [
+    {
+      "request": {
+        "method": "POST",
+        "url": "https://allowed.example/hook",
+        "headers": {
+          "Idempotency-Key": "order-1:submit:notify"
+        },
+        "body": "{\n  \"url\": \"https://allowed.example/hook\"\n}"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": "{\"ok\":true}"
+      }
+    }
+  ]
+}
