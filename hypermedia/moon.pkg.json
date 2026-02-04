@@ -3,6 +3,8 @@
     "fwd/core",
     "fwd/compiler",
     "fwd/ir",
+    "fwd/policy_v3",
+    "fwd/effects_v2_2",
     "fwd/runtime",
     "moonbitlang/core/json",
     "moonbitlang/x/fs"

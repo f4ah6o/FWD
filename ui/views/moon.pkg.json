@@ -3,12 +3,16 @@
     "fwd/core",
     "fwd/history_v2_1",
     "fwd/hypermedia",
+    "fwd/policy_v3",
+    "fwd/effects_v2_2",
     "fwd/store_v2_1",
     "f4ah6o/tmpx/tmpx"
   ],
   "test-import": [
     "fwd/runtime",
     "fwd/compiler",
+    "fwd/policy_v3",
+    "fwd/effects_v2_2",
     "moonbitlang/x/fs"
   ]
 }

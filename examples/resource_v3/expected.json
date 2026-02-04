@@ -1,0 +1,37 @@
+{
+  "state": "Draft",
+  "transitions": [
+    {
+      "id": "submit",
+      "to": "Approved",
+      "inputSchema": "PayloadV1",
+      "draftPayload": {
+        "amount": 10
+      },
+      "fieldErrors": [],
+      "policyDecision": {
+        "entityId": "order-1",
+        "transitionId": "submit",
+        "decision": "deny",
+        "reasons": [
+          {
+            "reasonVersion": 1,
+            "code": "POLICY_DENY",
+            "level": "error",
+            "target": "transition",
+            "message": "Policy denied execution"
+          }
+        ]
+      },
+      "effectsPreview": {
+        "planVersion": "2.2",
+        "entityId": "order-1",
+        "transitionId": "submit",
+        "status": "planned",
+        "items": [],
+        "reasons": []
+      },
+      "canExecute": false
+    }
+  ]
+}
