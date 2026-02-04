@@ -1,6 +1,6 @@
 ///|
 fn usage() -> String {
-  "usage: fwdc <schema.yaml> [output.json]\n       fwdc presets\n       fwdc validate <schema.yaml> [--baseline <baseline.yaml>] [--format json|--json]\n       fwdc runtime available <schema.yaml> --state <state> [--input <json>]\n       fwdc runtime execute <schema.yaml> --state <state> --transition <id> [--input <json>]\n       fwdc hypermedia show <schema.yaml> --state <state> [--input <json>]"
+  "usage: fwdc <schema.yaml> [output.json]\n       fwdc presets\n       fwdc validate <schema.yaml> [--baseline <baseline.yaml>] [--format json|--json]\n       fwdc runtime available <schema.yaml> --state <state> [--input <json>]\n       fwdc runtime execute <schema.yaml> --state <state> --transition <id> [--input <json>]\n       fwdc hypermedia show <schema.yaml> --state <state> [--input <json>]\n       fwdc effects plan <schema.yaml> --entity <id> --state <state> --transition <id> [--input <json>]"
 }
 
 ///|
@@ -177,6 +177,129 @@ pub fn run(args : Array[String]) -> Int {
     let output = @hypermedia.resource_json(resource).stringify(indent=2)
     println(output)
     return 0
+  }
+  if args[0] == "effects" {
+    if args.length() < 5 {
+      println(usage())
+      return 1
+    }
+    if args[1] != "plan" {
+      println(usage())
+      return 1
+    }
+    let schema_path = args[2]
+    let mut entity_id : String? = None
+    let mut state : String? = None
+    let mut transition_id : String? = None
+    let mut input_json : String? = None
+    for i = 3; i < args.length(); {
+      let arg = args[i]
+      if arg == "--entity" {
+        if i + 1 >= args.length() {
+          println(usage())
+          return 1
+        }
+        entity_id = Some(args[i + 1])
+        continue i + 2
+      } else if arg == "--state" {
+        if i + 1 >= args.length() {
+          println(usage())
+          return 1
+        }
+        state = Some(args[i + 1])
+        continue i + 2
+      } else if arg == "--transition" {
+        if i + 1 >= args.length() {
+          println(usage())
+          return 1
+        }
+        transition_id = Some(args[i + 1])
+        continue i + 2
+      } else if arg == "--input" {
+        if i + 1 >= args.length() {
+          println(usage())
+          return 1
+        }
+        input_json = Some(args[i + 1])
+        continue i + 2
+      } else {
+        println(usage())
+        return 1
+      }
+    } else {
+
+    }
+    let entity = match entity_id {
+      Some(value) => value
+      None => {
+        println(usage())
+        return 1
+      }
+    }
+    let current_state = match state {
+      Some(value) => value
+      None => {
+        println(usage())
+        return 1
+      }
+    }
+    let transition_name = match transition_id {
+      Some(value) => value
+      None => {
+        println(usage())
+        return 1
+      }
+    }
+    let rule_results = match input_json {
+      Some(text) =>
+        match parse_rule_results(text) {
+          Ok(values) => values
+          Err(reason) => {
+            println(runtime_error_json(reason).stringify(indent=2))
+            return 2
+          }
+        }
+      None => Map::new()
+    }
+    let schema_text = match read_input_result(schema_path) {
+      Ok(text) => text
+      Err(err) => {
+        println(runtime_error_json(@core.Reason::with_context(
+          "ReadFailure",
+          "read error: " + err.to_string(),
+          [
+            ("target", "runtime"),
+            ("level", "error"),
+            ("hint", "Provide a valid schema path"),
+          ],
+        )).stringify(indent=2))
+        return 1
+      }
+    }
+    let ir = match @compiler.compile_yaml(schema_text) {
+      Ok(value) => value
+      Err(err) => {
+        let reason = reason_from_compile_error(err)
+        println(runtime_error_json(reason).stringify(indent=2))
+        return 1
+      }
+    }
+    return match @runtime.execute_transition(
+      ir,
+      current_state,
+      transition_name,
+      rule_results,
+    ) {
+      Ok(outcome) => {
+        let plan = @effects_v2_2.plan_from_execution(entity, outcome)
+        println(@effects_v2_2.effect_plan_json(plan).stringify(indent=2))
+        0
+      }
+      Err(reason) => {
+        println(runtime_error_json(reason).stringify(indent=2))
+        1
+      }
+    }
   }
   if args[0] == "presets" {
     print_presets()

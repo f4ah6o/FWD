@@ -175,3 +175,59 @@ test "run hypermedia invalid input" {
     content="2",
   )
 }
+
+///|
+test "run effects plan planned" {
+  inspect(
+    run([
+      "effects", "plan", "examples/effects_v2_2/model.yaml",
+      "--entity", "order-1",
+      "--state", "Draft",
+      "--transition", "submit",
+      "--input", "{\"rules\": {\"canSubmit\": true}}",
+    ]),
+    content="0",
+  )
+}
+
+///|
+test "run effects plan skipped" {
+  inspect(
+    run([
+      "effects", "plan", "examples/effects_v2_2/model.yaml",
+      "--entity", "order-1",
+      "--state", "Draft",
+      "--transition", "submit",
+      "--input", "{\"rules\": {\"canSubmit\": false}}",
+    ]),
+    content="0",
+  )
+}
+
+///|
+test "run effects plan invalid input" {
+  inspect(
+    run([
+      "effects", "plan", "examples/effects_v2_2/model.yaml",
+      "--entity", "order-1",
+      "--state", "Draft",
+      "--transition", "submit",
+      "--input", "true",
+    ]),
+    content="2",
+  )
+}
+
+///|
+test "run effects plan not found" {
+  inspect(
+    run([
+      "effects", "plan", "examples/effects_v2_2/model.yaml",
+      "--entity", "order-1",
+      "--state", "Draft",
+      "--transition", "missing",
+      "--input", "{\"rules\": {\"canSubmit\": true}}",
+    ]),
+    content="1",
+  )
+}

@@ -2,6 +2,7 @@
   "is_main": true,
   "import": [
     "fwd/hypermedia",
+    "fwd/effects_v2_2",
     "fwd/compiler",
     "fwd/core",
     "fwd/runtime",
