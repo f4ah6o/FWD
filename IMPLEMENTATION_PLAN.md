@@ -362,10 +362,10 @@
 - HTTP status / envelope / Reason code を fixture で固定
 
 ## Frozen Contracts (v3)
-- M30a: `examples/v3/retry_policy/expected*.json` + tests
-- M30b: `examples/v3/idempotency/expected*.json` + tests
-- M30c: `examples/v3/execution_audit/expected*.json` + tests
-- M31: `examples/v3/policy/expected*.json` + tests
-- M32: `examples/v3/resource/expected.json|html|mx.html` + tests
-- M33: `examples/v3/timeline/expected*.json` + tests
-- M34: `examples/v3/api/expected*.json` + tests
+- M30a: `examples/v3/retry_policy/expected*.json` + `retry_policy_v3/retry_policy_test.mbt`
+- M30b: `examples/v3/idempotency/expected*.json` + `idempotency_v3/idempotency_test.mbt`
+- M30c: `examples/v3/execution_audit/expected*.json` + `execution_audit_v3/audit_test.mbt`
+- M31: `examples/v3/policy/expected*.json` + `policy_v3/policy_test.mbt`
+- M32: `examples/resource_v3/expected.json|html|mx.html` + `hypermedia/resource_v3_test.mbt`, `ui/views/resource_view_v3_test.mbt`
+- M33: `examples/v3/timeline/expected*.json` + `timeline_v3/timeline_test.mbt`
+- M34: `examples/api_v3/**/expected*.json` + `api_v3/api_test.mbt`
