@@ -3,6 +3,7 @@
     "fwd/core",
     "fwd/history_v2_1",
     "fwd/hypermedia",
+    "fwd/store_v2_1",
     "f4ah6o/tmpx/tmpx"
   ],
   "test-import": [

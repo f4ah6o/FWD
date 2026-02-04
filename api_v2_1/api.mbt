@@ -207,6 +207,11 @@ fn history_html_response(events : Array[@history_v2_1.HistoryEvent]) -> String {
 }
 
 ///|
+fn entity_html_response(snapshot : @store_v2_1.Snapshot) -> String {
+  @views.render_entity_html(snapshot)
+}
+
+///|
 fn handle_create(state : ApiState, req : ApiRequest) -> ApiResponse {
   let body = match req.body {
     Some(value) => value
@@ -234,7 +239,7 @@ fn handle_create(state : ApiState, req : ApiRequest) -> ApiResponse {
 }
 
 ///|
-fn handle_get(state : ApiState, entity_id : String) -> ApiResponse {
+fn handle_get(state : ApiState, entity_id : String, format : String) -> ApiResponse {
   let snapshot = match state.store.get(entity_id) {
     Some(value) => value
     None =>
@@ -250,6 +255,9 @@ fn handle_get(state : ApiState, entity_id : String) -> ApiResponse {
           ],
         )),
       )
+  }
+  if format == "v2_1_html" {
+    return response_html(200, entity_html_response(snapshot))
   }
   response_json(200, snapshot_response(snapshot))
 }
@@ -406,7 +414,7 @@ pub fn handle_request(
       }
       return handle_history(state, eid, format)
     }
-    return handle_get(state, entity_id)
+    return handle_get(state, entity_id, format)
   }
   if request.http_method == "POST" && request.path.has_suffix("/execute") {
     let trimmed = try! request.path[:request.path.length() - "/execute".length()].to_string()

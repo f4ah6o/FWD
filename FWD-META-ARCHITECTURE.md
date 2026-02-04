@@ -522,11 +522,13 @@ v2.1 は entity の保存・履歴・実行を **新しい surface** として�
 ### Endpoints
 - `POST /v2.1/entities`（create）
 - `GET /v2.1/entities/:id`（get）
-- `GET /v2.1/entities/:id/history`（history）
+- `GET /v2.1/entities/:id/history`（history JSON）
+- `GET /v2.1/entities/:id/history?format=v2_1_html`（history HTML, swap target: `.fwd-history`）
 - `POST /v2.1/entities/:id/execute`（execute-and-persist）
 
 ### Fixtures
 - `examples/api_v2_1/`
+- `examples/api_v2_1/history_html/expected.html`
 
 ## Hypermedia Layer (v1)
 
