@@ -1,0 +1,14 @@
+{
+  "entityId": "order-1",
+  "transitionId": "submit",
+  "decision": "deny",
+  "reasons": [
+    {
+      "reasonVersion": 1,
+      "code": "POLICY_DENY",
+      "level": "error",
+      "target": "transition",
+      "message": "Policy denied execution"
+    }
+  ]
+}

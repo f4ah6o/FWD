@@ -1,0 +1,6 @@
+{
+  "entityId": "order-1",
+  "transitionId": "submit",
+  "decision": "allow",
+  "reasons": []
+}
