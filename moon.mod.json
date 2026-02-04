@@ -1,7 +1,9 @@
 {
   "name": "fwd",
   "version": "0.1.0",
+  "preferred-target": "js",
   "deps": {
+    "moonbitlang/async": "0.16.4",
     "f4ah6o/mhx": "0.1.1",
     "f4ah6o/tmpx": "0.3.0",
     "moonbitlang/x": "0.4.38"
