@@ -143,3 +143,75 @@
 - Resolve/Validate 強化 (M1)
 - IR JSON の決定性 + golden テスト (M2)
 - baseline 差分の Reason 整備 (M3 の一部)
+
+---
+
+# v2.2 Implementation Plan (Effects)
+
+## 目的
+- Effects を **pure/deterministic** な “計画(Plan)” として導入する
+- v1/v2/v2.1 の凍結契約を壊さず、**新 surface** として追加する
+- Reason v1 を維持し、診断は no-inference で返す
+
+## v2.2 非目標 (Non-Goals)
+- 実行時の副作用（I/O, network, DB）を行う
+- 自動リトライ / 分散実行 / オーケストレーション
+- Effects を永続化する正式なストア契約
+
+## 前提
+- v1/v2/v2.1 は **完全に維持**（契約・fixture 変更なし）
+- v2.2 は **新しい CLI / API surface** のみ追加
+
+## マイルストーン
+
+### M18: Effect Spec + Plan (pure)
+- `effects_v2_2/` 新規パッケージ
+  - `effect_spec.mbt`（Effect/Kind/Result 型）
+  - `effect_plan.mbt`（pure planner）
+- Reason code（v1）を拡張
+  - `EFFECT_UNSUPPORTED`
+  - `EFFECT_INPUT_INVALID`
+  - `EFFECT_BLOCKED_POLICY`（必要時のみ）
+
+**DoD**
+- IR + transition + input から **決定的な plan** を返す
+- Reason v1 を source-site で生成
+- 副作用は発生しない
+
+### M19: Effect Plan JSON Contract
+- `effects_v2_2/effect_plan_json.mbt`
+- fixtures:
+  - `examples/effects_v2_2/expected.json`
+  - `examples/effects_v2_2/expected_blocked.json`
+
+**DoD**
+- JSON shape が fixture で固定
+- Reason v1 を含む
+- 出力順序が決定的
+
+### M20: CLI surface (plan-only)
+- `fwd effects plan <schema.yaml> --state <state> --transition <id> --input <json>`
+- exit code は既存 CLI と整合:
+  - `0`: valid request（plan が返る）
+  - `1`: not_found / not_available
+  - `2`: invalid input JSON
+
+**DoD**
+- CLI 出力が fixtures と完全一致
+- schema/Reason の検証が通る
+
+### M21: Optional Execution Adapter (stub)
+- `effects_v2_2/executor_stub.mbt`（dry-run / no-op）
+- 必要なら API surface:
+  - `POST /v2.2/effects/execute`（new surface）
+
+**DoD**
+- 実行は明示的・分離された surface
+- plan と execution は独立
+- v1/v2/v2.1 を一切変更しない
+
+## クロスカット (v2.2)
+- fixture-first: expected.json を先に固定
+- no inference: projection 層は推測しない
+- deterministic: ソート順・出力順は固定
+- Reason v1 を維持（必要なら v2 を別 surface で追加）

@@ -1,0 +1,26 @@
+fwdVersion: "1.0"
+schemaVersion: "1.0"
+
+states:
+  - Draft
+  - Approved
+
+rules:
+  - name: canSubmit
+    impl: dummy
+
+transitions:
+  - name: submit
+    from: Draft
+    to: Approved
+    rules:
+      - canSubmit
+    effects:
+      - notify
+      - audit
+
+effects:
+  - name: notify
+    kind: async
+  - name: audit
+    kind: sync

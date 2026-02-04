@@ -1,0 +1,21 @@
+{
+  "planVersion": "2.2",
+  "entityId": "order-1",
+  "transitionId": "submit",
+  "status": "planned",
+  "items": [
+    {
+      "effectId": "notify",
+      "kind": "async",
+      "payload": {},
+      "idempotencyKey": "order-1:submit:notify"
+    },
+    {
+      "effectId": "audit",
+      "kind": "sync",
+      "payload": {},
+      "idempotencyKey": "order-1:submit:audit"
+    }
+  ],
+  "reasons": []
+}
