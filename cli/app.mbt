@@ -1,6 +1,6 @@
 ///|
 fn usage() -> String {
-  "usage: fwdc <schema.yaml> [output.json]\n       fwdc presets\n       fwdc validate <schema.yaml> [--baseline <baseline.yaml>] [--format json|--json]\n       fwdc runtime available <schema.yaml> --state <state> [--input <json>]\n       fwdc runtime execute <schema.yaml> --state <state> --transition <id> [--input <json>]\n       fwdc hypermedia show <schema.yaml> --state <state> [--input <json>]\n       fwdc effects plan <schema.yaml> --entity <id> --state <state> --transition <id> [--input <json>]\n       fwdc effects execute --plan <json>\n       fwdc effects record --plan <plan.json> --cassette <cassette.json> [--out <execution.json>] --allow <prefix> [--allow <prefix>]"
+  "usage: fwdc <schema.yaml> [output.json]\n       fwdc presets\n       fwdc validate <schema.yaml> [--baseline <baseline.yaml>] [--format json|--json]\n       fwdc runtime available <schema.yaml> --state <state> [--input <json>]\n       fwdc runtime execute <schema.yaml> --state <state> --transition <id> [--input <json>]\n       fwdc hypermedia show <schema.yaml> --state <state> [--input <json>]\n       fwdc effects plan <schema.yaml> --entity <id> --state <state> --transition <id> [--input <json>]\n       fwdc effects execute --plan <json>\n       fwdc effects record --plan <plan.json> --cassette <cassette.json> [--out <execution.json>] --allow <prefix> [--allow <prefix>]\n       fwdc effects run --plan <plan.json> --config <config.json> [--cassette <cassette.json>]"
 }
 
 ///|
@@ -194,7 +194,7 @@ pub fn run(args : Array[String]) -> Int {
       println(usage())
       return 1
     }
-    if args[1] != "plan" && args[1] != "execute" && args[1] != "record" {
+    if args[1] != "plan" && args[1] != "execute" && args[1] != "record" && args[1] != "run" {
       println(usage())
       return 1
     }
@@ -348,6 +348,142 @@ pub fn run(args : Array[String]) -> Int {
       }
       println(exec_json)
       return 0
+    }
+    if args[1] == "run" {
+      if args.length() < 4 {
+        println(usage())
+        return 1
+      }
+      let mut plan_path : String? = None
+      let mut config_path : String? = None
+      let mut cassette_path : String? = None
+      for i = 2; i < args.length(); {
+        let arg = args[i]
+        if arg == "--plan" {
+          if i + 1 >= args.length() {
+            println(usage())
+            return 1
+          }
+          plan_path = Some(args[i + 1])
+          continue i + 2
+        } else if arg == "--config" {
+          if i + 1 >= args.length() {
+            println(usage())
+            return 1
+          }
+          config_path = Some(args[i + 1])
+          continue i + 2
+        } else if arg == "--cassette" {
+          if i + 1 >= args.length() {
+            println(usage())
+            return 1
+          }
+          cassette_path = Some(args[i + 1])
+          continue i + 2
+        } else {
+          println(usage())
+          return 1
+        }
+      } else {
+
+      }
+      let plan_file = match plan_path {
+        Some(value) => value
+        None => {
+          println(usage())
+          return 1
+        }
+      }
+      let config_file = match config_path {
+        Some(value) => value
+        None => {
+          println(usage())
+          return 1
+        }
+      }
+      let plan_text = match read_input_result(plan_file) {
+        Ok(text) => text
+        Err(err) => {
+          println(runtime_error_json(@core.Reason::with_context(
+            "ReadFailure",
+            "read error: " + err.to_string(),
+            [
+              ("target", "runtime"),
+              ("level", "error"),
+              ("hint", "Provide a valid plan path"),
+            ],
+          )).stringify(indent=2))
+          return 2
+        }
+      }
+      let config_text = match read_input_result(config_file) {
+        Ok(text) => text
+        Err(err) => {
+          println(runtime_error_json(@core.Reason::with_context(
+            "ReadFailure",
+            "read error: " + err.to_string(),
+            [
+              ("target", "runtime"),
+              ("level", "error"),
+              ("hint", "Provide a valid config path"),
+            ],
+          )).stringify(indent=2))
+          return 2
+        }
+      }
+      let plan = match @effects_v2_2.parse_plan_json(plan_text) {
+        Ok(value) => value
+        Err(reason) => {
+          println(runtime_error_json(reason).stringify(indent=2))
+          return 2
+        }
+      }
+      let config = match @effects_exec_real_v2_2.parse_config_json(config_text) {
+        Ok(value) => value
+        Err(reason) => {
+          println(runtime_error_json(reason).stringify(indent=2))
+          return 2
+        }
+      }
+      let send = match cassette_path {
+        Some(path) => {
+          let cassette_text = match read_input_result(path) {
+            Ok(text) => text
+            Err(err) => {
+              println(runtime_error_json(@core.Reason::with_context(
+                "ReadFailure",
+                "read error: " + err.to_string(),
+                [
+                  ("target", "runtime"),
+                  ("level", "error"),
+                  ("hint", "Provide a valid cassette path"),
+                ],
+              )).stringify(indent=2))
+              return 2
+            }
+          }
+          let cassette = match @effects_exec_rr_v2_2.parse_cassette_json(cassette_text) {
+            Ok(value) => value
+            Err(reason) => {
+              println(runtime_error_json(reason).stringify(indent=2))
+              return 2
+            }
+          }
+          @effects_exec_rr_v2_2.replay_transport(cassette)
+        }
+        None => record_send_stub
+      }
+      let result = @effects_exec_real_v2_2.execute_with_transport(
+        plan,
+        config,
+        send,
+      )
+      let output = @effects_v2_2.execution_result_json(result).stringify(indent=2)
+      println(output)
+      match result.status {
+        @effects_v2_2.ExecutionStatus::Failed => return 1
+        _ => return 0
+      }
     }
     let schema_path = args[2]
     let mut entity_id : String? = None

@@ -272,3 +272,16 @@ test "run effects execute invalid input" {
     content="2",
   )
 }
+
+///|
+test "run effects run with cassette" {
+  inspect(
+    run([
+      "effects", "run",
+      "--plan", "examples/effects_v2_2/record_cli/plan.json",
+      "--config", "examples/effects_v2_2/real_runner/config.json",
+      "--cassette", "examples/effects_v2_2/record_cli/expected_cassette.json",
+    ]),
+    content="0",
+  )
+}

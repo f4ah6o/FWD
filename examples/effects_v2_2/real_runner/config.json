@@ -1,0 +1,6 @@
+{
+  "allowlist": [
+    "https://allowed.example/"
+  ],
+  "timeoutMs": 1000
+}

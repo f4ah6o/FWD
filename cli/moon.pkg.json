@@ -5,6 +5,7 @@
     "fwd/effects_v2_2",
     "fwd/effects_exec_rr_v2_2",
     "fwd/effects_exec_adapters_v2_2",
+    "fwd/effects_exec_real_v2_2",
     "fwd/compiler",
     "fwd/core",
     "fwd/runtime",

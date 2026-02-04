@@ -1,0 +1,14 @@
+{
+  "resultVersion": "2.2",
+  "planVersion": "2.2",
+  "entityId": "order-1",
+  "transitionId": "submit",
+  "status": "executed",
+  "items": [
+    {
+      "effectId": "notify",
+      "status": "executed"
+    }
+  ],
+  "reasons": []
+}
