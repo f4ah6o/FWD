@@ -128,41 +128,29 @@ It does **not** replace the frozen runtime/CLI JSON.
 
 Fixture path: `examples/hypermedia_show/`.
 
-## M8: mhx client hypermedia execution (browser harness)
+## Resource v2 (M11)
 
-M8 adds a minimal browser harness to verify that **mx-enabled HTML** is interpreted by `mhx`
-and that clicking an mx control triggers a network request.
+v2 では **resource を first-class な契約**として追加し、JSON / HTML / MX の各投影を **resource v2** から決定的に生成します。  
+v1 の resource / runtime / Reason 契約は保持され、**新しい surface として併存**します。
 
-### Build
-```
-moon build ui/client/main --target js
-```
+### Endpoints / Formats
+- `GET /v2/resource?state=...&format=v2-json|v2-html|v2-mx`
+  - `v2-json`: resource v2 JSON（input schema / payload state / field errors を含む）
+  - `v2-html`: tmpx による決定的 HTML
+  - `v2-mx`: mhx 向け mx-* 属性付き HTML
+- `POST /v2/resource/validate`
+  - payload を検証し、エラー時は **Reason v1** を返却
+  - 成功時は resource v2 HTML（Execute CTA を含む）を返却
 
-### Run
-Serve `ui/client/main/index.html` via any static server (a file:// URL will not work because the
-script path must resolve).
+### Fixtures (Contract Locks)
+- `examples/resource_v2/expected.json`
+- `examples/resource_v2/expected.html`
+- `examples/resource_v2/expected_mx.html`
 
-Example:
-```
-# from repo root
-python3 -m http.server 8000
-```
-
-Then open:
-- `http://localhost:8000/ui/client/main/index.html`
-
-### Expected behavior
-- The page loads `_build/js/.../main.js`.
-- `main.js` calls `@client.init_mhx_client()`.
-- Clicking the mx-enabled button/link triggers a request to the deterministic endpoint pattern:
-  - `/hypermedia/transition/<id>`
-- The rendered HTML uses:
-  - `mx-target=".fwd-resource"`
-  - `mx-swap="outerHTML"`
-
-### Notes
-- This harness is a smoke test only; it proves client wiring and request triggering.
-- Server-side endpoints can be stubbed; the harness is valid as long as the network request fires.
+### Guarantees
+- **no-inference**：投影層は推測しない
+- **deterministic**：順序・構造は fixture で固定
+- **v1 untouched**：既存の v1 契約は変更しない
 
 ## M8: mhx client hypermedia execution (browser harness)
 
