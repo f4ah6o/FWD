@@ -4,6 +4,15 @@ test "run validate" {
 }
 
 ///|
+fn read_text_cli(path : String, label : String) -> String raise {
+  let result : Result[String, @fs.IOError] = try? @fs.read_file_to_string(path)
+  match result {
+    Ok(text) => text
+    Err(err) => fail("read failed: " + label + ": " + err.to_string())
+  }
+}
+
+///|
 test "run validate examples" {
   inspect(
     run(["validate", "examples/fwd_schema_change_valid.yaml"]),
@@ -229,5 +238,37 @@ test "run effects plan not found" {
       "--input", "{\"rules\": {\"canSubmit\": true}}",
     ]),
     content="1",
+  )
+}
+
+///|
+test "run effects execute executed" {
+  let plan = read_text_cli(
+    "examples/effects_v2_2/execute/plan_planned.json",
+    "plan",
+  )
+  inspect(
+    run(["effects", "execute", "--plan", plan]),
+    content="0",
+  )
+}
+
+///|
+test "run effects execute skipped" {
+  let plan = read_text_cli(
+    "examples/effects_v2_2/execute/plan_skipped.json",
+    "plan",
+  )
+  inspect(
+    run(["effects", "execute", "--plan", plan]),
+    content="0",
+  )
+}
+
+///|
+test "run effects execute invalid input" {
+  inspect(
+    run(["effects", "execute", "--plan", "true"]),
+    content="2",
   )
 }

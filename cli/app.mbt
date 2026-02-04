@@ -1,6 +1,6 @@
 ///|
 fn usage() -> String {
-  "usage: fwdc <schema.yaml> [output.json]\n       fwdc presets\n       fwdc validate <schema.yaml> [--baseline <baseline.yaml>] [--format json|--json]\n       fwdc runtime available <schema.yaml> --state <state> [--input <json>]\n       fwdc runtime execute <schema.yaml> --state <state> --transition <id> [--input <json>]\n       fwdc hypermedia show <schema.yaml> --state <state> [--input <json>]\n       fwdc effects plan <schema.yaml> --entity <id> --state <state> --transition <id> [--input <json>]"
+  "usage: fwdc <schema.yaml> [output.json]\n       fwdc presets\n       fwdc validate <schema.yaml> [--baseline <baseline.yaml>] [--format json|--json]\n       fwdc runtime available <schema.yaml> --state <state> [--input <json>]\n       fwdc runtime execute <schema.yaml> --state <state> --transition <id> [--input <json>]\n       fwdc hypermedia show <schema.yaml> --state <state> [--input <json>]\n       fwdc effects plan <schema.yaml> --entity <id> --state <state> --transition <id> [--input <json>]\n       fwdc effects execute --plan <json>"
 }
 
 ///|
@@ -95,6 +95,10 @@ pub fn run(args : Array[String]) -> Int {
       println(usage())
       return 1
     }
+    if args.length() < 5 {
+      println(usage())
+      return 1
+    }
     let schema_path = args[2]
     let mut state : String? = None
     let mut input_json : String? = None
@@ -179,13 +183,53 @@ pub fn run(args : Array[String]) -> Int {
     return 0
   }
   if args[0] == "effects" {
-    if args.length() < 5 {
+    if args.length() < 3 {
       println(usage())
       return 1
     }
-    if args[1] != "plan" {
+    if args[1] != "plan" && args[1] != "execute" {
       println(usage())
       return 1
+    }
+    if args[1] == "execute" {
+      if args.length() < 4 {
+        println(usage())
+        return 1
+      }
+      let mut plan_json : String? = None
+      for i = 2; i < args.length(); {
+        let arg = args[i]
+        if arg == "--plan" {
+          if i + 1 >= args.length() {
+            println(usage())
+            return 1
+          }
+          plan_json = Some(args[i + 1])
+          continue i + 2
+        } else {
+          println(usage())
+          return 1
+        }
+      } else {
+
+      }
+      let plan_text = match plan_json {
+        Some(value) => value
+        None => {
+          println(usage())
+          return 1
+        }
+      }
+      let plan = match @effects_v2_2.parse_plan_json(plan_text) {
+        Ok(value) => value
+        Err(reason) => {
+          println(runtime_error_json(reason).stringify(indent=2))
+          return 2
+        }
+      }
+      let result = @effects_v2_2.execute_plan_stub(plan)
+      println(@effects_v2_2.execution_result_json(result).stringify(indent=2))
+      return 0
     }
     let schema_path = args[2]
     let mut entity_id : String? = None
