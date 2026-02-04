@@ -308,6 +308,7 @@
 
 **DoD**
 - fixtures で policy 決定を固定
+- jitter は v3 では禁止（必要なら seed 注入 + fixture 固定の surface を別途追加）
 
 ### M30b: Idempotency Store Contract
 - key tracking / TTL semantics を契約化
@@ -346,6 +347,7 @@
 
 **DoD**
 - append-only + deterministic order を fixture で固定
+- 同一 logicalTime 内の sequence は 1,2,3... の単調増加で固定
 
 ### M34: v3 HTTP Adapter
 - `/v3/resource`
