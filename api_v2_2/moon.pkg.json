@@ -1,0 +1,13 @@
+{
+  "import": [
+    "fwd/core",
+    "fwd/compiler",
+    "fwd/runtime",
+    "fwd/hypermedia",
+    "fwd/effects_v2_2",
+    "moonbitlang/core/json"
+  ],
+  "test-import": [
+    "moonbitlang/x/fs"
+  ]
+}

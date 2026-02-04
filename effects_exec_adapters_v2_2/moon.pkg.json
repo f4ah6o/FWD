@@ -1,0 +1,7 @@
+{
+  "import": [
+    "fwd/core",
+    "fwd/effects_v2_2",
+    "moonbitlang/core/json"
+  ]
+}
