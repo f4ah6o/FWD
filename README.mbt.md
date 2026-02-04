@@ -179,6 +179,18 @@ Fixtures (contract locks):
 - `examples/effects_v2_2/cli_planned/expected.json`
 - `examples/effects_v2_2/cli_skipped/expected.json`
 
+## Effects execute (v2.2)
+
+Execute an effects plan using the deterministic stub runner (no external I/O). This surface consumes a plan JSON and emits a fixture-locked execution result.
+
+```
+fwdc effects execute --plan <plan.json>
+```
+
+Fixtures (contract locks):
+- `examples/effects_v2_2/execute/expected_executed.json`
+- `examples/effects_v2_2/execute/expected_skipped.json`
+
 ## M8: mhx client hypermedia execution (browser harness)
 
 M8 adds a minimal browser harness to verify that **mx-enabled HTML** is interpreted by `mhx`
