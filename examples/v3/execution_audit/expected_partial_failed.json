@@ -1,0 +1,27 @@
+{
+  "entityId": "order-1",
+  "transitionId": "submit",
+  "logicalTime": 12,
+  "sequence": 1,
+  "status": "failed",
+  "items": [
+    {
+      "effectId": "http:notify",
+      "status": "executed",
+      "durationMs": 90
+    },
+    {
+      "effectId": "http:archive",
+      "status": "failed",
+      "durationMs": 300,
+      "reason": {
+        "reasonVersion": 1,
+        "code": "EFFECT_HTTP_FAILED",
+        "level": "error",
+        "target": "effect",
+        "message": "HTTP request failed"
+      }
+    }
+  ],
+  "reasons": []
+}

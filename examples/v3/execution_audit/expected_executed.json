@@ -1,0 +1,15 @@
+{
+  "entityId": "order-1",
+  "transitionId": "submit",
+  "logicalTime": 10,
+  "sequence": 1,
+  "status": "executed",
+  "items": [
+    {
+      "effectId": "http:notify",
+      "status": "executed",
+      "durationMs": 120
+    }
+  ],
+  "reasons": []
+}

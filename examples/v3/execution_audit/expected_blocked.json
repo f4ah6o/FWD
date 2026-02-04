@@ -1,0 +1,17 @@
+{
+  "entityId": "order-1",
+  "transitionId": "submit",
+  "logicalTime": 11,
+  "sequence": 1,
+  "status": "blocked",
+  "items": [],
+  "reasons": [
+    {
+      "reasonVersion": 1,
+      "code": "RULE_NOT_SATISFIED",
+      "level": "error",
+      "target": "runtime",
+      "message": "Rule not satisfied"
+    }
+  ]
+}

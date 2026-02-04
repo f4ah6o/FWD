@@ -1,5 +1,8 @@
 ///|
 /// Idempotency store spec (v3).
+/// Key matching is exact (no normalization).
+/// Duplicate means in-flight conflict; already_done returns the existing result reference.
+/// TTL is a non-goal in v3 (no expiry).
 
 ///|
 pub(all) enum RecordStatus {
