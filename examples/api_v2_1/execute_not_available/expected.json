@@ -1,0 +1,10 @@
+{
+  "error": {
+    "reasonVersion": 1,
+    "code": "TRANSITION_NOT_AVAILABLE",
+    "level": "error",
+    "target": "transition",
+    "message": "transition not available from current state",
+    "hint": "Select a transition available from the current state"
+  }
+}

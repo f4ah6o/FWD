@@ -1,0 +1,15 @@
+{
+  "events": [
+    {
+      "eventId": 1,
+      "transition": "approve",
+      "from": "Draft",
+      "to": "Approved",
+      "payload": {
+        "note": "hello"
+      },
+      "result": "executed",
+      "reasons": []
+    }
+  ]
+}

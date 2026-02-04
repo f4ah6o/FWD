@@ -1,0 +1,8 @@
+{
+  "entityId": "order-1",
+  "state": "Draft",
+  "version": 1,
+  "payload": {
+    "note": "hello"
+  }
+}
