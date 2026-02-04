@@ -1,6 +1,7 @@
 {
   "import": [
     "fwd/core",
+    "fwd/history_v2_1",
     "fwd/hypermedia",
     "f4ah6o/tmpx/tmpx"
   ],

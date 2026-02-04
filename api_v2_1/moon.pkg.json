@@ -6,6 +6,7 @@
     "fwd/runtime",
     "fwd/store_v2_1",
     "fwd/history_v2_1",
+    "fwd/ui/views",
     "moonbitlang/core/json"
   ],
   "test-import": [

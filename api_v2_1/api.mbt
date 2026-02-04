@@ -34,6 +34,13 @@ fn response_json(status : Int, body : String) -> ApiResponse {
 }
 
 ///|
+fn response_html(status : Int, body : String) -> ApiResponse {
+  let headers : Map[String, String] = Map::new()
+  headers["content-type"] = "text/html"
+  { status, headers, body }
+}
+
+///|
 fn error_envelope_json(reason : @core.Reason) -> String {
   let obj : Map[String, Json] = Map::new()
   obj["error"] = @compiler.reason_json(reason)
@@ -195,6 +202,11 @@ fn history_response(events : Array[@history_v2_1.HistoryEvent]) -> String {
 }
 
 ///|
+fn history_html_response(events : Array[@history_v2_1.HistoryEvent]) -> String {
+  @views.render_history_html(events)
+}
+
+///|
 fn handle_create(state : ApiState, req : ApiRequest) -> ApiResponse {
   let body = match req.body {
     Some(value) => value
@@ -243,8 +255,11 @@ fn handle_get(state : ApiState, entity_id : String) -> ApiResponse {
 }
 
 ///|
-fn handle_history(state : ApiState, entity_id : String) -> ApiResponse {
+fn handle_history(state : ApiState, entity_id : String, format : String) -> ApiResponse {
   let events = state.history.get(entity_id)
+  if format == "v2_1_html" {
+    return response_html(200, history_html_response(events))
+  }
   response_json(200, history_response(events))
 }
 
@@ -349,31 +364,52 @@ fn handle_execute(schema_text : String, state : ApiState, req : ApiRequest, enti
 }
 
 ///|
+fn parse_request_path(req : ApiRequest) -> (ApiRequest, String) {
+  let mut format = "json"
+  let mut path = req.path
+  if path.contains("?format=") {
+    let pattern = "?format="
+    let index = path.find(pattern).unwrap_or(-1)
+    if index >= 0 {
+      let end_index = index + pattern.length()
+      if end_index <= path.length() {
+        let format_view = try! path[end_index:]
+        format = format_view.to_string()
+        let base_view = try! path[:index]
+        path = base_view.to_string()
+      }
+    }
+  }
+  ({ http_method: req.http_method, path, body: req.body }, format)
+}
+
+///|
 pub fn handle_request(
   schema_text : String,
   state : ApiState,
   req : ApiRequest,
 ) -> ApiResponse {
-  if req.http_method == "POST" && req.path == "/v2.1/entities" {
-    return handle_create(state, req)
+  let (request, format) = parse_request_path(req)
+  if request.http_method == "POST" && request.path == "/v2.1/entities" {
+    return handle_create(state, request)
   }
-  if req.http_method == "GET" && req.path.has_prefix("/v2.1/entities/") {
-    let entity_id = match parse_entity_id(req.path, "/v2.1/entities/") {
+  if request.http_method == "GET" && request.path.has_prefix("/v2.1/entities/") {
+    let entity_id = match parse_entity_id(request.path, "/v2.1/entities/") {
       Some(value) => value
       None => return response_json(404, error_envelope_json(missing_field_reason("entityId")))
     }
-    if req.path.has_suffix("/history") {
-      let trimmed = try! req.path[:req.path.length() - "/history".length()].to_string()
+    if request.path.has_suffix("/history") {
+      let trimmed = try! request.path[:request.path.length() - "/history".length()].to_string()
       let eid = match parse_entity_id(trimmed, "/v2.1/entities/") {
         Some(value) => value
         None => return response_json(404, error_envelope_json(missing_field_reason("entityId")))
       }
-      return handle_history(state, eid)
+      return handle_history(state, eid, format)
     }
     return handle_get(state, entity_id)
   }
-  if req.http_method == "POST" && req.path.has_suffix("/execute") {
-    let trimmed = try! req.path[:req.path.length() - "/execute".length()].to_string()
+  if request.http_method == "POST" && request.path.has_suffix("/execute") {
+    let trimmed = try! request.path[:request.path.length() - "/execute".length()].to_string()
     let entity_id = match parse_entity_id(trimmed, "/v2.1/entities/") {
       Some(value) => value
       None =>
@@ -390,7 +426,7 @@ pub fn handle_request(
           )),
         )
     }
-    return handle_execute(schema_text, state, req, entity_id)
+    return handle_execute(schema_text, state, request, entity_id)
   }
   response_json(
     404,
