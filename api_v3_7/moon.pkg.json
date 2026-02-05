@@ -1,0 +1,12 @@
+{
+  "import": [
+    "fwd/core",
+    "fwd/compiler",
+    "fwd/metrics_v3_6",
+    "fwd/metrics_export_v3_7",
+    "moonbitlang/core/json"
+  ],
+  "test-import": [
+    "moonbitlang/x/fs"
+  ]
+}

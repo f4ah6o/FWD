@@ -1,0 +1,9 @@
+{
+  "import": [
+    "fwd/metrics_v3_6",
+    "moonbitlang/core/json"
+  ],
+  "test-import": [
+    "moonbitlang/x/fs"
+  ]
+}

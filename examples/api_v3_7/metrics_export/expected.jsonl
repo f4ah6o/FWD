@@ -1,0 +1,4 @@
+{"type":"total","window":{"entityId":"order-1","fromLogicalTime":10,"toLogicalTime":12},"counts":{"ok":1,"failed":1,"blocked":0,"denied":1}}
+{"type":"kind","window":{"entityId":"order-1","fromLogicalTime":10,"toLogicalTime":12},"kind":"transition","counts":{"ok":1,"failed":0,"blocked":0,"denied":0}}
+{"type":"kind","window":{"entityId":"order-1","fromLogicalTime":10,"toLogicalTime":12},"kind":"policy","counts":{"ok":0,"failed":0,"blocked":0,"denied":1}}
+{"type":"kind","window":{"entityId":"order-1","fromLogicalTime":10,"toLogicalTime":12},"kind":"effect","counts":{"ok":0,"failed":1,"blocked":0,"denied":0}}
