@@ -388,3 +388,4 @@
 - Timeline event detail contract: `examples/v3_4/timeline_event_detail/expected.json` + `timeline_event_v3_4/detail_test.mbt`
 - v3.4 timeline event view: `examples/v3_4/timeline_event_detail/expected.html` + `ui/views/timeline_event_view_v3_4_test.mbt`
 - v3.4 timeline event endpoint: `examples/api_v3_4/timeline_event/expected*.json`, `examples/api_v3_4/timeline_event/expected.html` + `api_v3_4/api_test.mbt`
+- v3.4 timeline mx view: `examples/v3_4/timeline_mx/expected.html` + `ui/views/timeline_view_v3_4_mx_test.mbt`

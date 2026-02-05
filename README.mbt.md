@@ -284,6 +284,12 @@ v3.4 adds a timeline event detail partial (`/v3.4/timeline/event/:id`).
 See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v3.4)”.
 Fixtures live under `examples/api_v3_4/`.
 
+## v3.4 Timeline mx drilldown view
+
+v3.4 adds an mx-enabled timeline view that swaps event detail partials.
+See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v3.4)”.
+Fixtures live under `examples/v3_4/timeline_mx/`.
+
 ## M8: mhx client hypermedia execution (browser harness)
 
 M8 adds a minimal browser harness to verify that **mx-enabled HTML** is interpreted by `mhx`
