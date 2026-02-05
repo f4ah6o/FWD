@@ -1,0 +1,15 @@
+{
+  "import": [
+    "fwd/core",
+    "fwd/compiler",
+    "fwd/effects_v2_2",
+    "fwd/effects_exec_adapters_v2_2",
+    "fwd/executor_v3_1",
+    "fwd/idempotency_v3",
+    "fwd/retry_policy_v3",
+    "moonbitlang/core/json"
+  ],
+  "test-import": [
+    "moonbitlang/x/fs"
+  ]
+}

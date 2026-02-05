@@ -1,0 +1,28 @@
+{
+  "plan": {
+    "planVersion": "2.2",
+    "entityId": "order-1",
+    "transitionId": "submit",
+    "status": "planned",
+    "items": [
+      {
+        "effectId": "notify",
+        "kind": "async",
+        "payload": {
+          "url": "https://api.example.com/notify"
+        },
+        "idempotencyKey": "order-1:submit:notify"
+      }
+    ],
+    "reasons": []
+  },
+  "allowlist": ["https://api.example.com/"],
+  "logicalTimeStart": 10,
+  "idempotency": {
+    "key": "order-1:submit",
+    "kind": "done",
+    "logicalTime": 10,
+    "reservedAt": 10,
+    "resultRef": "exec-1"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "error": {
+    "reasonVersion": 1,
+    "code": "INPUT_MISSING",
+    "level": "error",
+    "target": "runtime",
+    "message": "missing field: plan",
+    "hint": "Provide field 'plan' in JSON body"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "error": {
+    "reasonVersion": 1,
+    "code": "INPUT_MISSING",
+    "level": "error",
+    "target": "runtime",
+    "message": "missing field: allowlist",
+    "hint": "Provide field 'allowlist' in JSON body"
+  }
+}
