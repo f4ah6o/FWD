@@ -1,0 +1,12 @@
+{
+  "import": [
+    "fwd/compiler",
+    "fwd/timeline_event_v3_4",
+    "fwd/timeline_v3",
+    "moonbitlang/core/json"
+  ],
+  "test-import": [
+    "fwd/core",
+    "moonbitlang/x/fs"
+  ]
+}

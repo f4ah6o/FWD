@@ -1,0 +1,10 @@
+{
+  "error": {
+    "reasonVersion": 1,
+    "code": "EVENT_ID_INVALID",
+    "level": "error",
+    "target": "runtime",
+    "message": "invalid event id",
+    "hint": "Use event id in the form entity:logical:sequence:kind"
+  }
+}
