@@ -374,3 +374,7 @@
 - M35: `examples/v3_1/executor/expected_*.json` + `executor_v3_1/executor_test.mbt`
 - M36: `executor_v3_1/runner.mbt` + `executor_v3_1/executor_test.mbt`
 - M37: `examples/api_v3_1/execute/expected_*.json` + `api_v3_1/api_test.mbt`
+
+## Frozen Contracts (v3.2)
+- Timeline HTML projection: `examples/v3/timeline/expected.html` + `ui/views/timeline_view_v3_test.mbt`
+- v3.2 timeline endpoint: `examples/api_v3_2/timeline/expected.html`, `examples/api_v3_2/timeline/expected_missing_entity.json` + `api_v3_2/api_test.mbt`

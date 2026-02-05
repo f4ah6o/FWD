@@ -266,6 +266,12 @@ v3.1 adds a detailed executor surface for effects execution.
 See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v3.1)”.
 Fixtures live under `examples/api_v3_1/`.
 
+## v3.2 Timeline HTML
+
+v3.2 exposes timeline HTML as a standalone surface.
+See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v3.2)”.
+Fixtures live under `examples/api_v3_2/`.
+
 ## M8: mhx client hypermedia execution (browser harness)
 
 M8 adds a minimal browser harness to verify that **mx-enabled HTML** is interpreted by `mhx`
