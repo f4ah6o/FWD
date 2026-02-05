@@ -308,6 +308,12 @@ v3.7 adds `/v3.7/metrics/export.jsonl` (deterministic metrics export).
 See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v3.7)”.
 Fixtures live under `examples/api_v3_7/`.
 
+## v3.8 Timeline event list (filters + paging)
+
+v3.8 adds `/v3.8/timeline/events` (filtered event list HTML).
+See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v3.8)”.
+Fixtures live under `examples/api_v3_8/`.
+
 ## M8: mhx client hypermedia execution (browser harness)
 
 M8 adds a minimal browser harness to verify that **mx-enabled HTML** is interpreted by `mhx`

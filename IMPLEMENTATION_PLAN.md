@@ -401,3 +401,8 @@
 ## Frozen Contracts (v3.7)
 - Metrics export contract: `examples/v3_7/metrics_export/expected.jsonl` + `metrics_export_v3_7/export_test.mbt`
 - v3.7 metrics export endpoint: `examples/api_v3_7/metrics_export/expected.jsonl`, `examples/api_v3_7/metrics_export/expected_invalid_query.json` + `api_v3_7/api_test.mbt`
+
+## Frozen Contracts (v3.8)
+- Timeline event list query contract: `examples/v3_8/timeline_event_list/expected_cursor.json` + `timeline_event_v3_8/query_test.mbt`
+- v3.8 timeline event list view: `examples/api_v3_8/timeline_event_list/expected_page*.html` + `ui/views/timeline_event_view_v3_8_test.mbt`
+- v3.8 timeline event list endpoint: `examples/api_v3_8/timeline_event_list/expected_page*.html`, `examples/api_v3_8/timeline_event_list/expected_invalid_query.json` + `api_v3_8/api_test.mbt`
