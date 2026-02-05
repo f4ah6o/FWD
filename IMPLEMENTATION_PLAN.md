@@ -393,3 +393,7 @@
 ## Frozen Contracts (v3.5)
 - Timeline export contract: `examples/v3_5/timeline_export/expected.jsonl` + `timeline_export_v3_5/export_test.mbt`
 - v3.5 timeline export endpoint: `examples/api_v3_5/timeline_export/expected*.jsonl`, `examples/api_v3_5/timeline_export/expected_invalid_query.json` + `api_v3_5/api_test.mbt`
+
+## Frozen Contracts (v3.6)
+- Metrics contract: `examples/v3_6/metrics/expected.json` + `metrics_v3_6/metrics_test.mbt`
+- v3.6 metrics endpoint: `examples/api_v3_6/metrics/expected.json`, `examples/api_v3_6/metrics/expected_invalid_query.json` + `api_v3_6/api_test.mbt`

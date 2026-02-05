@@ -296,6 +296,12 @@ v3.5 adds `/v3.5/timeline/export.jsonl` (deterministic export).
 See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v3.5)”.
 Fixtures live under `examples/api_v3_5/`.
 
+## v3.6 Metrics
+
+v3.6 adds `/v3.6/metrics` (deterministic metrics snapshot).
+See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v3.6)”.
+Fixtures live under `examples/api_v3_6/`.
+
 ## M8: mhx client hypermedia execution (browser harness)
 
 M8 adds a minimal browser harness to verify that **mx-enabled HTML** is interpreted by `mhx`
