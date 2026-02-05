@@ -1,0 +1,98 @@
+{
+  "resourceVersion": "4.0",
+  "entity": {
+    "id": "order-1",
+    "state": "Draft",
+    "logicalTime": 12
+  },
+  "input": {
+    "schema": {
+      "type": "object",
+      "properties": {
+        "reason": { "type": "string" }
+      },
+      "required": ["reason"]
+    },
+    "draft": {
+      "reason": "Need approval"
+    },
+    "fieldErrors": [
+      {
+        "path": "/reason",
+        "reason": {
+          "reasonVersion": 1,
+          "code": "INPUT_REQUIRED",
+          "level": "error",
+          "target": "runtime",
+          "message": "reason is required",
+          "hint": "Provide a non-empty reason"
+        }
+      }
+    ]
+  },
+  "policy": {
+    "decision": "deny",
+    "reasons": [
+      {
+        "reasonVersion": 1,
+        "code": "POLICY_DENY",
+        "level": "error",
+        "target": "transition",
+        "message": "Policy denied execution"
+      }
+    ]
+  },
+  "effects": {
+    "planPreview": {
+      "planVersion": "2.2",
+      "entityId": "order-1",
+      "transitionId": "submit",
+      "status": "planned",
+      "items": [
+        {
+          "effectId": "notify",
+          "kind": "async",
+          "payload": {},
+          "idempotencyKey": "order-1:submit:notify"
+        }
+      ],
+      "reasons": []
+    },
+    "execution": {
+      "status": "skipped",
+      "reasons": [
+        {
+          "reasonVersion": 1,
+          "code": "RULE_NOT_SATISFIED",
+          "level": "info",
+          "target": "rule",
+          "message": "Rule not satisfied",
+          "hint": "Provide rule result true for this transition"
+        }
+      ]
+    }
+  },
+  "timeline": {
+    "cursor": "offset:0",
+    "events": [
+      {
+        "eventId": "order-1:11:1:policy",
+        "entityId": "order-1",
+        "logicalTime": 11,
+        "sequence": 1,
+        "kind": "policy",
+        "refId": "policy:submit",
+        "status": "deny",
+        "reasons": [
+          {
+            "reasonVersion": 1,
+            "code": "POLICY_DENY",
+            "level": "error",
+            "target": "transition",
+            "message": "Policy denied execution"
+          }
+        ]
+      }
+    ]
+  }
+}

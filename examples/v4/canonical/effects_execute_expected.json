@@ -1,0 +1,37 @@
+{
+  "effectsVersion": "4.0",
+  "plan": {
+    "planVersion": "2.2",
+    "entityId": "order-1",
+    "transitionId": "submit",
+    "status": "planned",
+    "items": [
+      {
+        "effectId": "notify",
+        "kind": "async",
+        "payload": {},
+        "idempotencyKey": "order-1:submit:notify"
+      }
+    ],
+    "reasons": []
+  },
+  "execution": {
+    "resultVersion": "2.2",
+    "planVersion": "2.2",
+    "entityId": "order-1",
+    "transitionId": "submit",
+    "status": "executed",
+    "items": [
+      {
+        "effectId": "notify",
+        "status": "executed"
+      }
+    ],
+    "reasons": []
+  },
+  "audit": {
+    "logicalTime": 12,
+    "sequence": 1,
+    "status": "executed"
+  }
+}

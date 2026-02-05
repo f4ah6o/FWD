@@ -1,0 +1,41 @@
+{
+  "timelineVersion": "4.0",
+  "query": {
+    "entityId": "order-1",
+    "fromLogicalTime": 10,
+    "toLogicalTime": 12,
+    "limit": 2,
+    "cursor": "offset:0"
+  },
+  "events": [
+    {
+      "eventId": "order-1:10:1:transition",
+      "entityId": "order-1",
+      "logicalTime": 10,
+      "sequence": 1,
+      "kind": "transition",
+      "refId": "submit",
+      "status": "executed",
+      "reasons": []
+    },
+    {
+      "eventId": "order-1:11:1:policy",
+      "entityId": "order-1",
+      "logicalTime": 11,
+      "sequence": 1,
+      "kind": "policy",
+      "refId": "policy:submit",
+      "status": "deny",
+      "reasons": [
+        {
+          "reasonVersion": 1,
+          "code": "POLICY_DENY",
+          "level": "error",
+          "target": "transition",
+          "message": "Policy denied execution"
+        }
+      ]
+    }
+  ],
+  "nextCursor": "offset:2"
+}
