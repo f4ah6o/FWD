@@ -413,4 +413,5 @@
 - v3.9 timeline event page endpoint: `examples/api_v3_9/timeline_event_page/expected*.json`, `examples/api_v3_9/timeline_event_page/expected.html` + `api_v3_9/api_test.mbt`
 
 ## Frozen Contracts (v4)
-- Canonical fixtures: `examples/v4/canonical/*.json`
+- Canonical fixtures: `examples/v4/canonical/*.json` + `canonical_v4/fixtures_test.mbt`
+- v4 HTML fixtures: `examples/v4/html/*` + `ui/views/resource_view_v4_test.mbt`, `ui/views/timeline_view_v4_test.mbt`, `ui/views/timeline_detail_view_v4_test.mbt`
