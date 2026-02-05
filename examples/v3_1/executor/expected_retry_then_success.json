@@ -1,0 +1,58 @@
+{
+  "executionVersion": "3.1",
+  "entityId": "order-1",
+  "transitionId": "submit",
+  "status": "executed",
+  "attempts": [
+    {
+      "attempt": 1,
+      "logicalTime": 20,
+      "sequence": 1,
+      "status": "failed",
+      "delayMs": 0,
+      "reason": {
+        "reasonVersion": 1,
+        "code": "EFFECT_HTTP_FAILED",
+        "level": "error",
+        "target": "effect",
+        "message": "HTTP request failed"
+      }
+    },
+    {
+      "attempt": 2,
+      "logicalTime": 21,
+      "sequence": 1,
+      "status": "executed",
+      "delayMs": 1000
+    }
+  ],
+  "idempotency": {
+    "key": "order-1:submit",
+    "kind": "done",
+    "logicalTime": 21,
+    "reservedAt": 20,
+    "resultRef": "exec-2"
+  },
+  "retryPolicy": {
+    "policyVersion": "3",
+    "maxAttempts": 3,
+    "backoff": {
+      "kind": "fixed",
+      "delayMs": 1000
+    },
+    "scheduleMs": [
+      0,
+      1000,
+      1000
+    ]
+  },
+  "auditEvent": {
+    "entityId": "order-1",
+    "transitionId": "submit",
+    "logicalTime": 21,
+    "sequence": 1,
+    "status": "executed",
+    "items": [],
+    "reasons": []
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "import": [
+    "fwd/core",
+    "fwd/compiler",
+    "fwd/retry_policy_v3",
+    "fwd/idempotency_v3",
+    "fwd/execution_audit_v3",
+    "moonbitlang/core/json"
+  ],
+  "test-import": [
+    "moonbitlang/x/fs"
+  ]
+}

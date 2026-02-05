@@ -1,0 +1,49 @@
+{
+  "executionVersion": "3.1",
+  "entityId": "order-1",
+  "transitionId": "submit",
+  "status": "skipped",
+  "attempts": [],
+  "idempotency": {
+    "key": "order-1:submit",
+    "kind": "already_done",
+    "logicalTime": 30,
+    "reservedAt": 10,
+    "resultRef": "exec-1"
+  },
+  "retryPolicy": {
+    "policyVersion": "3",
+    "maxAttempts": 3,
+    "backoff": {
+      "kind": "fixed",
+      "delayMs": 1000
+    },
+    "scheduleMs": [
+      0,
+      1000,
+      1000
+    ]
+  },
+  "auditEvent": {
+    "entityId": "order-1",
+    "transitionId": "submit",
+    "logicalTime": 30,
+    "sequence": 1,
+    "status": "failed",
+    "items": [
+      {
+        "effectId": "http:notify",
+        "status": "failed",
+        "durationMs": 120,
+        "reason": {
+          "reasonVersion": 1,
+          "code": "IDEMPOTENCY_DUPLICATE",
+          "level": "error",
+          "target": "runtime",
+          "message": "Already executed"
+        }
+      }
+    ],
+    "reasons": []
+  }
+}

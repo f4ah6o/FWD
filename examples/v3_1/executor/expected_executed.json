@@ -1,0 +1,44 @@
+{
+  "executionVersion": "3.1",
+  "entityId": "order-1",
+  "transitionId": "submit",
+  "status": "executed",
+  "attempts": [
+    {
+      "attempt": 1,
+      "logicalTime": 10,
+      "sequence": 1,
+      "status": "executed",
+      "delayMs": 0
+    }
+  ],
+  "idempotency": {
+    "key": "order-1:submit",
+    "kind": "done",
+    "logicalTime": 10,
+    "reservedAt": 10,
+    "resultRef": "exec-1"
+  },
+  "retryPolicy": {
+    "policyVersion": "3",
+    "maxAttempts": 3,
+    "backoff": {
+      "kind": "fixed",
+      "delayMs": 1000
+    },
+    "scheduleMs": [
+      0,
+      1000,
+      1000
+    ]
+  },
+  "auditEvent": {
+    "entityId": "order-1",
+    "transitionId": "submit",
+    "logicalTime": 10,
+    "sequence": 1,
+    "status": "executed",
+    "items": [],
+    "reasons": []
+  }
+}
