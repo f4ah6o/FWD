@@ -5,6 +5,7 @@
     "fwd/hypermedia",
     "fwd/policy_v3",
     "fwd/effects_v2_2",
+    "fwd/timeline_v3",
     "fwd/store_v2_1",
     "f4ah6o/tmpx/tmpx"
   ],

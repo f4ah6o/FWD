@@ -1,0 +1,10 @@
+{
+  "error": {
+    "reasonVersion": 1,
+    "code": "QUERY_MISSING",
+    "level": "error",
+    "target": "runtime",
+    "message": "missing query: entity",
+    "hint": "Provide query 'entity'"
+  }
+}
