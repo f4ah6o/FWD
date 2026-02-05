@@ -252,6 +252,14 @@ Contract locks:
 - `examples/effects_v2_2/real_runner/config.json`
 - `examples/effects_v2_2/real_runner/expected_execution.json`
 
+## v3 HTTP endpoints
+
+v3 introduces hardened execution surfaces (policy, effects hardening, unified timeline)
+as new immutable contracts.
+
+See `IMPLEMENTATION_PLAN.md` → “v3 Implementation Plan” and “Frozen Contracts (v3)”.
+Fixtures live under `examples/api_v3/`.
+
 ## M8: mhx client hypermedia execution (browser harness)
 
 M8 adds a minimal browser harness to verify that **mx-enabled HTML** is interpreted by `mhx`
