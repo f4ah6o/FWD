@@ -350,6 +350,12 @@ v4.3 adds read-only metrics export endpoints for JSONL and CSV.
 See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v4.3)”.
 Fixtures live under `examples/api_v4_3/`.
 
+## v4.4 metrics drilldown
+
+v4.4 adds drilldown partials for metrics by kind under `/v4.4/metrics/kind/:kind`.
+See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v4.4)”.
+Fixtures live under `examples/api_v4_4/`.
+
 ## M8: mhx client hypermedia execution (browser harness)
 
 M8 adds a minimal browser harness to verify that **mx-enabled HTML** is interpreted by `mhx`

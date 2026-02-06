@@ -1,0 +1,10 @@
+{
+  "error": {
+    "reasonVersion": 1,
+    "code": "QUERY_INVALID",
+    "level": "error",
+    "target": "runtime",
+    "message": "invalid kind",
+    "hint": "Check query parameters"
+  }
+}
