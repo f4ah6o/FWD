@@ -1,0 +1,15 @@
+{
+  "import": [
+    "fwd/core",
+    "fwd/compiler",
+    "fwd/export_job_v4_7",
+    "fwd/job_store_v4_7",
+    "fwd/metrics_job_v4_7",
+    "fwd/timeline_job_v4_7",
+    "fwd/timeline_event_v3_8",
+    "moonbitlang/core/json"
+  ],
+  "test-import": [
+    "moonbitlang/x/fs"
+  ]
+}

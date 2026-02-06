@@ -1,0 +1,12 @@
+{
+  "jobVersion": "4.7",
+  "jobId": "job-1",
+  "kind": "metrics",
+  "status": "done",
+  "progress": {
+    "processed": 3,
+    "total": 3
+  },
+  "ttlSeconds": 120,
+  "downloadUrl": "/v4.7/metrics/export/jobs/job-1/result.jsonl"
+}

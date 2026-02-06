@@ -368,6 +368,18 @@ v4.6 adds async-style export jobs under `/v4.6/*` with job status + download URL
 See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v4.6)”.
 Fixtures live under `examples/api_v4_6/`.
 
+## v4.7 export jobs (progress/cancel/retention)
+
+v4.7 adds progress, cancel, and retention semantics for export jobs under `/v4.7/*`.
+See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v4.7)”.
+Fixtures live under `examples/api_v4_7/`.
+
+## v4.7 export jobs (progress/cancel/retention)
+
+v4.7 adds progress, cancel, and retention semantics for export jobs under `/v4.7/*`.
+See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v4.7)”.
+Fixtures live under `examples/api_v4_7/`.
+
 ## v4.6 export jobs
 
 v4.6 adds async-style export jobs under `/v4.6/*` with job status + download URLs.

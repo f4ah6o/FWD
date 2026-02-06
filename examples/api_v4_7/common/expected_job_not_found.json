@@ -1,0 +1,10 @@
+{
+  "error": {
+    "reasonVersion": 1,
+    "code": "JOB_NOT_FOUND",
+    "level": "error",
+    "target": "runtime",
+    "message": "job not found: job-999",
+    "hint": "Check job id"
+  }
+}

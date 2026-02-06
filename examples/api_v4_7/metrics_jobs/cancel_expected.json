@@ -1,0 +1,21 @@
+{
+  "jobVersion": "4.7",
+  "jobId": "job-1",
+  "kind": "metrics",
+  "status": "failed",
+  "progress": {
+    "processed": 0,
+    "total": 3
+  },
+  "ttlSeconds": 120,
+  "reasons": [
+    {
+      "reasonVersion": 1,
+      "code": "JOB_CANCELED",
+      "level": "error",
+      "target": "runtime",
+      "message": "job canceled: job-1",
+      "hint": "Job was canceled"
+    }
+  ]
+}

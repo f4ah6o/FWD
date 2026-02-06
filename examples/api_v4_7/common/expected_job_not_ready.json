@@ -1,0 +1,10 @@
+{
+  "error": {
+    "reasonVersion": 1,
+    "code": "JOB_NOT_READY",
+    "level": "error",
+    "target": "runtime",
+    "message": "job not ready: job-1",
+    "hint": "Wait for job to complete"
+  }
+}

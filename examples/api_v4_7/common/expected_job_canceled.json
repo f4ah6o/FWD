@@ -1,0 +1,10 @@
+{
+  "error": {
+    "reasonVersion": 1,
+    "code": "JOB_CANCELED",
+    "level": "error",
+    "target": "runtime",
+    "message": "job canceled: job-1",
+    "hint": "Job was canceled"
+  }
+}

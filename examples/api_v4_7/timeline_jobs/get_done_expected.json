@@ -1,0 +1,12 @@
+{
+  "jobVersion": "4.7",
+  "jobId": "job-1",
+  "kind": "timeline",
+  "status": "done",
+  "progress": {
+    "processed": 3,
+    "total": 3
+  },
+  "ttlSeconds": 120,
+  "downloadUrl": "/v4.7/timeline/export/jobs/job-1/result.jsonl"
+}

@@ -437,3 +437,6 @@
 
 ## Frozen Contracts (v4.6)
 - v4.6 export jobs endpoints: `examples/api_v4_6/**` + `api_v4_6/api_test.mbt`
+
+## Frozen Contracts (v4.7)
+- v4.7 export jobs endpoints: `examples/api_v4_7/**` + `api_v4_7/api_test.mbt`

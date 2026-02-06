@@ -1,0 +1,11 @@
+{
+  "jobVersion": "4.7",
+  "jobId": "job-1",
+  "kind": "metrics",
+  "status": "queued",
+  "progress": {
+    "processed": 0,
+    "total": 3
+  },
+  "ttlSeconds": 120
+}
