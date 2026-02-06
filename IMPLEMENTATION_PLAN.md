@@ -416,3 +416,7 @@
 - Canonical fixtures: `examples/v4/canonical/*.json` + `canonical_v4/fixtures_test.mbt`
 - v4 HTML fixtures: `examples/v4/html/*` + `ui/views/resource_view_v4_test.mbt`, `ui/views/timeline_view_v4_test.mbt`, `ui/views/timeline_detail_view_v4_test.mbt`
 - v4 HTTP adapter: `examples/api_v4/**` + `api_v4/api_test.mbt`
+
+## Frozen Contracts (v4.2)
+- v4.2 metrics view: `examples/v4_2/metrics/expected*.html` + `ui/views/metrics_view_v4_2_test.mbt`
+- v4.2 metrics endpoint: `examples/api_v4_2/metrics/expected*.html`, `examples/api_v4_2/metrics/expected_invalid_query.json` + `api_v4_2/api_test.mbt`
