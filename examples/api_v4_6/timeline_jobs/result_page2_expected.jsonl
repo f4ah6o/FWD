@@ -1,0 +1,1 @@
+{"eventId":"order-1:12:1:effect","entityId":"order-1","logicalTime":12,"sequence":1,"kind":"effect","refId":"http:archive","status":"failed","reasons":[{"reasonVersion":1,"code":"EFFECT_HTTP_FAILED","level":"error","target":"effect","message":"HTTP request failed"}]}

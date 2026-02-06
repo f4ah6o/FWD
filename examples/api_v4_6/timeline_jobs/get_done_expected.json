@@ -1,0 +1,7 @@
+{
+  "jobVersion": "4.6",
+  "jobId": "job-1",
+  "kind": "timeline",
+  "status": "done",
+  "downloadUrl": "/v4.6/timeline/export/jobs/job-1/result.jsonl"
+}

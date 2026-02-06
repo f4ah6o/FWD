@@ -1,0 +1,9 @@
+{
+  "import": [
+    "fwd/export_job_v4_6",
+    "moonbitlang/core/ref"
+  ],
+  "test-import": [
+    "moonbitlang/x/fs"
+  ]
+}

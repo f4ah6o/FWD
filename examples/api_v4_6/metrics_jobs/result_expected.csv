@@ -1,0 +1,5 @@
+type,entityId,fromLogicalTime,toLogicalTime,kind,ok,failed,blocked,denied
+total,order-1,10,12,,1,1,0,1
+kind,order-1,10,12,transition,1,0,0,0
+kind,order-1,10,12,policy,0,0,0,1
+kind,order-1,10,12,effect,0,1,0,0

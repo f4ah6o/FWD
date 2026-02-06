@@ -362,6 +362,18 @@ v4.5 adds time-range metrics export and cursor-based timeline export under `/v4.
 See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v4.5)”.
 Fixtures live under `examples/api_v4_5/`.
 
+## v4.6 export jobs
+
+v4.6 adds async-style export jobs under `/v4.6/*` with job status + download URLs.
+See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v4.6)”.
+Fixtures live under `examples/api_v4_6/`.
+
+## v4.6 export jobs
+
+v4.6 adds async-style export jobs under `/v4.6/*` with job status + download URLs.
+See `IMPLEMENTATION_PLAN.md` → “Frozen Contracts (v4.6)”.
+Fixtures live under `examples/api_v4_6/`.
+
 ## v4.5 export filters
 
 v4.5 adds time-range metrics export and cursor-based timeline export under `/v4.5/*`.

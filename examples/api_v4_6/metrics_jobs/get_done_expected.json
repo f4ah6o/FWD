@@ -1,0 +1,7 @@
+{
+  "jobVersion": "4.6",
+  "jobId": "job-1",
+  "kind": "metrics",
+  "status": "done",
+  "downloadUrl": "/v4.6/metrics/export/jobs/job-1/result.jsonl"
+}

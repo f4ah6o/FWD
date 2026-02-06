@@ -434,3 +434,6 @@
 - v4.5 metrics export endpoints: `examples/api_v4_5/metrics_export/expected.jsonl`, `examples/api_v4_5/metrics_export/expected.csv`, `examples/api_v4_5/metrics_export/expected_invalid_query.json` + `api_v4_5/api_test.mbt`
 - v4.5 timeline export contract: `examples/v4_5/timeline_export/expected.jsonl` + `timeline_export_v4_5/export_test.mbt`
 - v4.5 timeline export endpoint: `examples/api_v4_5/timeline_export/expected_page*.jsonl`, `examples/api_v4_5/timeline_export/expected_invalid_query.json`, `examples/api_v4_5/timeline_export/expected_invalid_cursor.json` + `api_v4_5/api_test.mbt`
+
+## Frozen Contracts (v4.6)
+- v4.6 export jobs endpoints: `examples/api_v4_6/**` + `api_v4_6/api_test.mbt`
