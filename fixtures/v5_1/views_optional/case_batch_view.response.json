@@ -1,0 +1,12 @@
+{
+  "status": 200,
+  "headers": {},
+  "body": {
+    "jobVersion": "5.1",
+    "jobId": "batch-11",
+    "status": "queued",
+    "progress": {"processed": 0, "total": 2},
+    "ttlSeconds": 240,
+    "childIds": ["job-111", "job-112"]
+  }
+}
