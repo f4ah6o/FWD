@@ -1,0 +1,23 @@
+{
+  "status": 200,
+  "headers": {},
+  "body": {
+    "jobVersion": "5.1",
+    "evaluationAxis": "poll_count",
+    "pollCount": 9,
+    "effectiveExpiryPollCount": 9,
+    "expired": true,
+    "postExpiryVisibility": {
+      "results": "hidden",
+      "metadata": "retained"
+    },
+    "resultAccess": {
+      "get": "hidden",
+      "download": "hidden"
+    },
+    "metadataAccess": {
+      "get": "retained",
+      "status": "retained"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "status": 200,
+  "headers": {},
+  "body": {
+    "jobVersion": "5.1",
+    "evaluationAxis": "poll_count",
+    "pollCount": 6,
+    "scopes": {
+      "system": {"expiryPollCount": 10},
+      "batch": {"expiryPollCount": 8},
+      "job": {"expiryPollCount": 6}
+    },
+    "precedenceOrder": ["job", "batch", "system"],
+    "effectiveScope": "job",
+    "effectiveExpiryPollCount": 6,
+    "expired": true,
+    "postExpiryVisibility": {
+      "results": "hidden",
+      "metadata": "retained"
+    }
+  }
+}

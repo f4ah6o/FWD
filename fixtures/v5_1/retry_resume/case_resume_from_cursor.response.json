@@ -1,0 +1,13 @@
+{
+  "status": 200,
+  "headers": {},
+  "body": {
+    "jobVersion": "5.1",
+    "jobId": "job-8",
+    "status": "running",
+    "progress": {"processed": 2, "total": 5},
+    "ttlSeconds": 120,
+    "executionMode": "resume",
+    "resumeCursor": "cursor-v5_1-job-8-step-2"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "status": 200,
+  "headers": {},
+  "body": {
+    "jobVersion": "5.1",
+    "jobId": "job-9",
+    "status": "running",
+    "progress": {"processed": 1, "total": 4},
+    "ttlSeconds": 120,
+    "executionMode": "partial_resume",
+    "resumeCursor": "cursor-v5_1-job-9-step-1",
+    "unitGranularity": "job_segments",
+    "resumeUnits": ["segment-2", "segment-4"]
+  }
+}

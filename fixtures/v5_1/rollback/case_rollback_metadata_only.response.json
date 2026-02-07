@@ -1,0 +1,18 @@
+{
+  "status": 200,
+  "headers": {},
+  "body": {
+    "jobVersion": "5.1",
+    "jobId": "batch-3",
+    "status": "rolled_back",
+    "rollbackMode": "metadata_only",
+    "createdAtAnchor": "anchor-v5-batch-3-created",
+    "ttlSeconds": 240,
+    "childIds": ["job-31", "job-32"],
+    "children": [
+      {"jobId": "job-31", "status": "rolled_back"},
+      {"jobId": "job-32", "status": "rolled_back"}
+    ],
+    "results": {"visibility": "retained"}
+  }
+}
