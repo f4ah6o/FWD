@@ -3,19 +3,13 @@
   "status": 200,
   "headers": {},
   "body": {
-    "jobVersion": "5.2-draft",
+    "jobVersion": "5.2",
     "jobId": "job-1",
-    "visibility": "visible",
-    "retentionPolicy": {
-      "combine": "all",
-      "axes": [
-        {"type": "poll_count_max", "value": "__TBD__"},
-        {"type": "generation_min", "value": "__TBD__"}
-      ]
+    "status": "queued",
+    "progress": {
+      "processed": 0,
+      "total": 3
     },
-    "retentionContext": {
-      "pollCount": "__TBD__",
-      "generation": "__TBD__"
-    }
+    "generation": 1
   }
 }

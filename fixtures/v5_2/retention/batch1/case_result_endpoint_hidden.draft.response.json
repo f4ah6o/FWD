@@ -13,6 +13,7 @@
     },
     "retentionDetails": {
       "visibility": "hidden",
+      "combine": "all",
       "endpoint": "result",
       "failedAxes": "__TBD__"
     }
