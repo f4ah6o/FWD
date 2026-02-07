@@ -235,6 +235,13 @@ fn default_policy_batch() -> @export_job_v5_2.RetentionPolicyV52 {
   }
 }
 
+fn default_policy_system() -> @export_job_v5_2.RetentionPolicyV52 {
+  {
+    combine: @export_job_v5_2.RetentionCombineV52::All,
+    axes: [@export_job_v5_2.RetentionAxisConditionV52::PollCountMax(3)],
+  }
+}
+
 fn parse_policy_optional(obj : Map[String, Json], default_policy : @export_job_v5_2.RetentionPolicyV52) -> Result[@export_job_v5_2.RetentionPolicyV52, @core.Reason] {
   match obj.get("retentionPolicy") {
     None => Ok(default_policy)
@@ -414,14 +421,19 @@ fn evaluate_job_visibility(job : @export_job_v5_2.JobRecord, endpoint : String?)
     }
     _ => ()
   }
+  let resolved = @retention_v5_2.resolve_retention_policy_v52(
+    Some(job.retention_policy),
+    None,
+    Some(default_policy_system()),
+  )
   let outcome = @retention_v5_2.evaluate_retention_v52(
-    job.retention_policy,
+    resolved.policy,
     { poll_count: job.poll_count, generation: job.generation },
   )
   match outcome {
     @export_job_v5_2.RetentionOutcomeV52::Visible => None
     @export_job_v5_2.RetentionOutcomeV52::Hidden(failed) => {
-      let details = @retention_v5_2.retention_details(job.retention_policy, failed)
+      let details = @retention_v5_2.retention_details(resolved.policy, failed)
       Some(response_json(404, error_with_retention_json(job_hidden_reason(job.id.value), details, endpoint)))
     }
   }
@@ -443,14 +455,19 @@ fn evaluate_batch_visibility(batch : @export_job_batch_v5_2.BatchJobRecord, endp
     }
     _ => ()
   }
+  let resolved = @retention_v5_2.resolve_retention_policy_v52(
+    None,
+    Some(batch.retention_policy),
+    Some(default_policy_system()),
+  )
   let outcome = @retention_v5_2.evaluate_retention_v52(
-    batch.retention_policy,
+    resolved.policy,
     { poll_count: batch.poll_count, generation: batch.generation },
   )
   match outcome {
     @export_job_v5_2.RetentionOutcomeV52::Visible => None
     @export_job_v5_2.RetentionOutcomeV52::Hidden(failed) => {
-      let details = @retention_v5_2.retention_details(batch.retention_policy, failed)
+      let details = @retention_v5_2.retention_details(resolved.policy, failed)
       Some(response_json(404, error_with_retention_json(job_hidden_reason(batch.id), details, endpoint)))
     }
   }
