@@ -58,3 +58,7 @@ Entries are ideas, not commitments.
 - `deterministic_invariants`: `TBD`
 - `non_goals`: `TBD`
 - `open_questions`: `Interpretation boundary, explainability, failure mapping.`
+
+## Initial Out-of-Scope (Non-Binding)
+- `v5_2_candidate_scheduling_001`: depends on wall-clock and background execution assumptions that would require cross-cutting runtime model changes.
+- `v5_2_candidate_policy_integration_001`: assumes crossing the v5.1 non-interpreting boundary and would require semantics that span policy and job layers.
