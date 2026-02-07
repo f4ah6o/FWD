@@ -52,6 +52,16 @@ pub fn reset_for_test() -> Unit {
 }
 
 ///|
+pub fn seed_for_test(next_id : Int, jobs : Array[@export_job_v5_2.JobRecord]) -> Unit {
+  @export_job_v5_2.seed_id_for_test(next_id)
+  let seeded : Map[String, @export_job_v5_2.JobRecord] = Map::new()
+  for job in jobs {
+    seeded[job.id.value] = job
+  }
+  store.val = seeded
+}
+
+///|
 pub fn create_job(
   format : @export_job_v5_2.ResultFormat,
   retention_policy : @export_job_v5_2.RetentionPolicyV52,

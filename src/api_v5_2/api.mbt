@@ -69,6 +69,20 @@ fn error_with_retention_json(
   Json::object(obj).stringify(indent=2)
 }
 
+fn error_with_compatibility_json(
+  reason : @core.Reason,
+  source_status : String,
+  mode : String,
+) -> String {
+  let obj : Map[String, Json] = Map::new()
+  obj["error"] = @compiler.reason_json(reason)
+  obj["compatibility"] = Json::object({
+    "sourceStatus": Json::string(source_status),
+    "mode": Json::string(mode),
+  })
+  Json::object(obj).stringify(indent=2)
+}
+
 fn invalid_query_reason(message : String) -> @core.Reason {
   @core.Reason::with_context(
     "QUERY_INVALID",
@@ -137,6 +151,18 @@ fn job_hidden_reason(job_id : String) -> @core.Reason {
       ("target", "runtime"),
       ("level", "error"),
       ("hint", "Job retention policy hidden"),
+    ],
+  )
+}
+
+fn job_legacy_hidden_reason(job_id : String) -> @core.Reason {
+  @core.Reason::with_context(
+    "JOB_EXPIRED",
+    "job hidden by retention: " + job_id,
+    [
+      ("target", "runtime"),
+      ("level", "error"),
+      ("hint", "Legacy expired compatibility path"),
     ],
   )
 }
@@ -373,6 +399,21 @@ fn batch_result_body_csv(batch : @export_job_batch_v5_2.BatchJobRecord) -> Strin
 }
 
 fn evaluate_job_visibility(job : @export_job_v5_2.JobRecord, endpoint : String?) -> ApiResponse? {
+  match job.status {
+    @export_job_v5_2.JobStatus::Expired => {
+      return Some(
+        response_json(
+          404,
+          error_with_compatibility_json(
+            job_legacy_hidden_reason(job.id.value),
+            "expired",
+            "legacy-read",
+          ),
+        ),
+      )
+    }
+    _ => ()
+  }
   let outcome = @retention_v5_2.evaluate_retention_v52(
     job.retention_policy,
     { poll_count: job.poll_count, generation: job.generation },
@@ -387,6 +428,21 @@ fn evaluate_job_visibility(job : @export_job_v5_2.JobRecord, endpoint : String?)
 }
 
 fn evaluate_batch_visibility(batch : @export_job_batch_v5_2.BatchJobRecord, endpoint : String?) -> ApiResponse? {
+  match batch.status {
+    @export_job_v5_2.JobStatus::Expired => {
+      return Some(
+        response_json(
+          404,
+          error_with_compatibility_json(
+            job_legacy_hidden_reason(batch.id),
+            "expired",
+            "legacy-read",
+          ),
+        ),
+      )
+    }
+    _ => ()
+  }
   let outcome = @retention_v5_2.evaluate_retention_v52(
     batch.retention_policy,
     { poll_count: batch.poll_count, generation: batch.generation },

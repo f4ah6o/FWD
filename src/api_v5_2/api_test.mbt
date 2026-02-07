@@ -137,3 +137,39 @@ test "api v5.2 batch get hidden by generation" {
   })
   inspect(res.status, content="404")
 }
+
+///|
+test "api v5.2 get legacy expired compatibility block" {
+  @job_store_v5_2.reset_for_test()
+  @job_store_v5_2.seed_for_test(1, [{
+    id: { value: "job-1" },
+    status: @export_job_v5_2.JobStatus::Expired,
+    progress: { processed: 1, total: 3 },
+    retention_policy: {
+      combine: @export_job_v5_2.RetentionCombineV52::All,
+      axes: [@export_job_v5_2.RetentionAxisConditionV52::PollCountMax(3)],
+    },
+    generation: 1,
+    format: @export_job_v5_2.ResultFormat::Jsonl,
+    reasons: [],
+    poll_count: 5,
+  }])
+  let res = handle_request({
+    http_method: "GET",
+    path: "/v5.2/export/jobs/job-1",
+    query: query_map([]),
+    body: None,
+  })
+  inspect(res.status, content="404")
+  let body = parse_json_or_fail(res.body, "legacy expired body")
+  let obj = match body {
+    Object(v) => v
+    _ => fail("expected object")
+  }
+  let compat = match obj.get("compatibility") {
+    Some(Object(v)) => v
+    _ => fail("missing compatibility")
+  }
+  inspect(compat.get("sourceStatus").to_string(), content="Some(String(\"expired\"))")
+  inspect(compat.get("mode").to_string(), content="Some(String(\"legacy-read\"))")
+}
