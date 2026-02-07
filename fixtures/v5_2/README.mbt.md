@@ -10,7 +10,7 @@ It does not define frozen semantics yet.
 ## Current status
 - Planning state: `open`
 - Freeze status: `not started`
-- Scope status: `candidate collection`
+- Scope status: `focused exploration`
 
 ## Suggested layout
 ```
@@ -21,9 +21,16 @@ fixtures/v5_2/
     retention_axis/
     lifecycle/
     policy_integration/
+  retention/
+    README.mbt.md
+    batch1/
+      *.draft.response.json
+    batch2/
+      *.draft.response.json
 ```
 
 ## Rules
 - Add candidate fixtures as explicit v5.2 artifacts only.
 - Keep cases deterministic (no wall-clock/random/environment coupling).
 - Do not treat candidate fixtures as canonical until v5.2 freeze.
+- Draft files use `*.draft.response.json` and are non-authoritative by default.

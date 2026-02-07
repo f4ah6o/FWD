@@ -14,8 +14,12 @@ It does not freeze semantics.
 
 ## Planning Direction (Non-Binding)
 - v5.2 planning focus: generalize retention from single-axis poll-count to multi-axis retention.
-- Explicit exclusion in this planning direction: wall-clock axis is not introduced.
+- Explicit exclusion in this planning direction: wall-clock axis is not introduced in v5.2 scope.
 - This direction is exploratory and does not start freeze.
+
+## Working Proposal Reference (Non-Binding)
+- See `V5_2_RETENTION_MULTI_AXIS_DRAFT.md`.
+- Any API/algorithm behavior in that document is a working proposal for comparison, not a frozen contract.
 
 ## Candidate Scope (Parking Lot)
 - Streaming or partial result delivery

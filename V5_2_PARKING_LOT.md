@@ -40,7 +40,7 @@ Entries are ideas, not commitments.
 - `candidate_fixtures`: `fixtures/v5_2/candidates/retention_axis/`
 - `touches_scheduling_or_policy_integration`: `no`
 - `deterministic_invariants`: `TBD`
-- `non_goals`: `Introduce wall-clock as a retention axis.`
+- `non_goals`: `Introduce wall-clock as a retention axis in v5.2.`
 - `open_questions`: `Which non-time axes are representable from existing deterministic state; how cross-axis precedence is expressed when poll-count and secondary axes diverge; how post-expiry visibility remains legible across axes without redefining lifecycle states.`
 
 - `id`: `v5_2_candidate_lifecycle_001`
@@ -72,3 +72,12 @@ Entries are ideas, not commitments.
 - `focus_note`: `This focus explores multi-axis retention generalization with poll-count retained and wall-clock excluded.`
 - `scope_note`: `Other in-scope candidates remain active in intake.`
 - `freeze_note`: `No freeze, commitment, or prioritization is implied by this marker.`
+
+## Retention Working Proposal Snapshot (Non-Binding)
+- `axis_min_set`: `poll_count_max + generation_min`
+- `combine_candidate`: `all (AND)`
+- `eval_timing_candidate`: `read-time only (GET / RESULT)`
+- `hidden_api_candidate`: `404 + ReasonV1 + retentionDetails`
+- `failed_axes_candidate`: `return all failed axes in policy order`
+- `precedence_candidate`: `job > batch > system (same as current, planning baseline)`
+- `fixture_batches`: `Batch 1 = visibility+reasons, Batch 2 = precedence`
