@@ -14,6 +14,13 @@ It is not a freeze artifact and does not commit semantics.
 - Batch 2 precedence remains open draft scope.
 - This marker does not start global v5.2 freeze.
 
+## Batch 2 Draft-Frozen Scope (Precedence)
+- Batch 2 precedence behavior is draft-frozen as currently implemented and tested:
+  - `job > batch > system`
+- Batch 1 draft-frozen scope remains unchanged.
+- No additional semantics are frozen by this marker.
+- This marker does not start global v5.2 freeze.
+
 ## Summary
 - Target: generalize retention from single-axis poll-count to multi-axis (non-time axes only).
 - Baseline: v5.1.0 semantics remain immutable.

@@ -27,6 +27,14 @@ It does not freeze semantics.
   - scheduling/background worker semantics
 - Global freeze status remains `not started`.
 
+## Draft Freeze Marker (Scoped: Batch 2 Precedence)
+- Retention Batch 2 precedence semantics are `draft-frozen` in v5.2 planning scope.
+- Covered precedence rule:
+  - `job > batch > system`
+- Batch 1 draft-freeze remains unchanged.
+- No additional semantics are frozen by this marker.
+- Global freeze status remains `not started`.
+
 ## Planning Direction (Non-Binding)
 - v5.2 planning focus: generalize retention from single-axis poll-count to multi-axis retention.
 - Explicit exclusion in this planning direction: wall-clock axis is not introduced in v5.2 scope.
