@@ -1,0 +1,12 @@
+{
+  "import": [
+    "fwd/core",
+    "fwd/compiler",
+    "fwd/export_job_v5",
+    "fwd/export_job_v5_2",
+    "fwd/export_job_batch_v5_2",
+    "fwd/job_store_v5_2",
+    "fwd/retention_v5_2",
+    "moonbitlang/core/json"
+  ]
+}
