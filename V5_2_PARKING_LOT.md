@@ -66,3 +66,9 @@ Entries are ideas, not commitments.
 ## Initial Out-of-Scope (Non-Binding)
 - `v5_2_candidate_scheduling_001`: depends on wall-clock and background execution assumptions that would require cross-cutting runtime model changes.
 - `v5_2_candidate_policy_integration_001`: assumes crossing the v5.1 non-interpreting boundary and would require semantics that span policy and job layers.
+
+## Draft Focus Candidate (Non-Binding)
+- `current_focus`: `v5_2_candidate_retention_axis_001`
+- `focus_note`: `This focus is exploratory for candidate elaboration only.`
+- `scope_note`: `Other in-scope candidates remain active in intake.`
+- `freeze_note`: `No freeze, commitment, or prioritization is implied by this marker.`
